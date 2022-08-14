@@ -1,0 +1,8 @@
+MOVE = "move"
+WORK = "work"
+CARRY = "carry"
+ATTACK = "attack"
+RANGED_ATTACK = "ranged_attack"
+HEAL = "heal"
+CLAIM = "claim"
+TOUGH = "tough"
