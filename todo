@@ -1,0 +1,1 @@
+Look into creating a custom FS so that Lua code can be updated without recompiling everything.

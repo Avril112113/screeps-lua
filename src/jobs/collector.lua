@@ -1,8 +1,52 @@
-local function isSourceValid(source)
+local DISTANCE_WEIGHT = 1/10
+local PRINT_PRIORITY = false
+
+
+-- From: https://github.com/kennyledet/Algorithm-Implementations/blob/master/Weighted_Random_Distribution/Lua/Yonaba/weighted_random.lua
+-- items   : an array-list of values
+-- weights : a map table holding the weight for each value in
+--  in the `items` list.
+-- returns : an iterator function
+local function expanding_random(items, weights)
+	local list = {}
+	for _, item in ipairs(items) do
+		local n = weights[item] * 100
+		for i = 1, n do table.insert(list, item) end
+	end
+	return function()
+		return list[math.random(1, #list)]
+	end
+end
+
+-- From: https://github.com/kennyledet/Algorithm-Implementations/blob/master/Weighted_Random_Distribution/Lua/Yonaba/weighted_random.lua
+-- items   : an array-list of values
+-- weights : a map table holding the weight for each value in
+--  in the `items` list.
+-- returns : an iterator function
+local function in_place_random(items, weights)
+	local partial_sums, partial_sum = {}, 0
+	for _, item in ipairs(items) do
+		partial_sum = partial_sum + weights[item]
+		table.insert(partial_sums, partial_sum)
+	end
+	return function()
+		local n, s = math.random(), 0
+		for i, si in ipairs(partial_sums) do
+			s = s + si
+			if si > n then return items[i] end
+		end
+	end
+end
+
+
+local function isSourceValid(source, creep)
 	if source.energy <= 0 then
 		return false
 	end
 	local pos = source.pos
+	if math.abs(creep.pos.x - pos.x) <= 1 and math.abs(creep.pos.y - pos.y) <= 1 then
+		return true
+	end
 	local terrain = source.room:lookForAtArea("terrain", pos.y-1, pos.x-1, pos.y+1, pos.x+1, true)
 	for _, tile in ipairs(terrain) do
 		if tile.terrain ~= "wall" then
@@ -19,9 +63,36 @@ local function findAvailableSource(creep)
 		return creep.pos:getRangeTo(source)
 	end)
 	sources = sources:filter(function(source, index, array)
-		return isSourceValid(source)
+		return isSourceValid(source, creep)
 	end)
 	return sources[1]
+end
+
+local function findBestSpawnOrExtension(creep)
+	local structures = creep.room:find(108)
+	structures = structures:filter(function(structure, index, array)
+		local structureType = structure.structureType
+		if structureType == "spawn" or structureType == "extension" then
+			return (structure.store:getFreeCapacity("energy") or 0) > 0
+		end
+		return false
+	end)
+	structures = LowDash:sortBy(structures, function(structure)
+		return creep.pos:getRangeTo(structure)
+	end)
+	return structures[1]
+end
+
+local function existsConstructionSite(creep)
+	local sites = creep.room:find(111)
+	return #sites > 0
+end
+local function findConstructionSite(creep)
+	local sites = creep.room:find(111)
+	sites = LowDash:sortBy(sites, function(source)
+		return creep.pos:getRangeTo(source)
+	end)
+	return sites[1]
 end
 
 
@@ -32,6 +103,9 @@ local tasks = {
 			if creep.memory.targetSource ~= nil then
 				source = Game:getObjectById(creep.memory.targetSource)
 			end
+			if source ~= nil and source.energy <= 0 then
+				source = nil
+			end
 			if creep.memory.targetSource == nil then
 				source = findAvailableSource(creep)
 				if source ~= nil then
@@ -39,69 +113,172 @@ local tasks = {
 				end
 			end
 			if source == nil then
-				-- print_warn("Failed to find available source...")
+				if creep.memory.targetSource == nil then
+					creep.memory:_delete("targetSource")
+				end
 				return true
 			end
 			if creep:harvest(source) == -9 then
-				creep:moveTo(source, {visualizePathStyle={stroke="#ffffff"}})
+				creep:moveTo(source, {visualizePathStyle={stroke="#ffff00"}})
 			end
 			if creep.store:getFreeCapacity("energy") == 0 then
-				creep.memory.targetSource = nil
+				creep.memory:_delete("targetSource")
 				return true
 			end
 			return false
 		end,
 		shouldStart = function(creep)
-			return creep.store:getUsedCapacity("energy") == 0
+			return creep.store:getUsedCapacity("energy") == 0 and findAvailableSource(creep) ~= nil
+		end,
+		getPriority = function(creep)
+			return 1 / (creep.pos:getRangeTo(findAvailableSource(creep))*DISTANCE_WEIGHT)
 		end,
 	},
 	transferSpawn = {
 		update = function(creep)
-			local spawn = Game.spawns["W9N1_0"]
-			if creep:transfer(spawn, "energy") == -9 then
-				creep:moveTo(spawn, {visualizePathStyle={stroke="#ffffff"}})
+			local structure
+			if creep.memory.targetStructure ~= nil then
+				structure = Game:getObjectById(creep.memory.targetStructure)
 			end
-			return creep.store:getUsedCapacity("energy") == 0
+			if creep.memory.targetStructure == nil then
+				structure = findBestSpawnOrExtension(creep)
+				if structure ~= nil then
+					creep.memory.targetStructure = structure.id
+				end
+			end
+			if structure == nil then
+				if creep.memory.targetStructure == nil then
+					creep.memory:_delete("targetStructure")
+				end
+				return true
+			end
+			local result = creep:transfer(structure, "energy")
+			if result == -9 then
+				creep:moveTo(structure, {visualizePathStyle={stroke="#728799"}})
+			end
+			if result == -8 or creep.store:getUsedCapacity("energy") == 0 then
+				creep.memory:_delete("targetStructure")
+				return true
+			end
+			return false
 		end,
 		shouldStart = function(creep)
-			return creep.store:getUsedCapacity("energy") > 0
+			return creep.store:getUsedCapacity("energy") > 0 and findBestSpawnOrExtension(creep) ~= nil
+		end,
+		getPriority = function(creep)
+			local creepCount = #creep.room:find(102)
+			return (
+					creepCount < 4 and 20 or
+					creepCount < 8 and 15 or
+					creepCount < 12 and 3 or
+					0
+				) / (creep.pos:getRangeTo(findBestSpawnOrExtension(creep))*DISTANCE_WEIGHT)
 		end,
 	},
 	upgradeController = {
 		update = function(creep)
 			local controller = creep.room.controller
 			if creep:upgradeController(controller) == -9 then
-				creep:moveTo(controller, {visualizePathStyle={stroke="#ffffff"}})
+				creep:moveTo(controller, {visualizePathStyle={stroke="#ff44ff"}})
 			end
 			return creep.store:getUsedCapacity("energy") == 0
 		end,
 		shouldStart = function(creep)
 			return creep.store:getUsedCapacity("energy") > 0
 		end,
+		getPriority = function(creep)
+			return (5 + (creep.room.controller.ticksToDowngrade < 15000 and creep.room.controller.ticksToDowngrade / 15000 * 100 or 0))
+					/ (creep.pos:getRangeTo(creep.room.controller)*DISTANCE_WEIGHT)
+		end,
+	},
+	build = {
+		update = function(creep)
+			local constructionSite
+			if creep.memory.targetConstructionSite ~= nil then
+				constructionSite = Game:getObjectById(creep.memory.targetConstructionSite)
+			end
+			if creep.memory.targetConstructionSite == nil then
+				constructionSite = findConstructionSite(creep)
+				if constructionSite ~= nil then
+					creep.memory.targetConstructionSite = constructionSite.id
+				end
+			end
+			if constructionSite == nil then
+				if creep.memory.targetConstructionSite ~= nil then
+					creep.memory:_delete("targetConstructionSite")
+				end
+				return true
+			end
+			local result = creep:build(constructionSite)
+			if result == -9 then
+				creep:moveTo(constructionSite, {visualizePathStyle={stroke="#ffff44"}})
+			end
+			if creep.store:getUsedCapacity("energy") <= 0 or Game:getObjectById(creep.memory.targetConstructionSite) == nil then
+				creep.memory:_delete("targetConstructionSite")
+				return true
+			end
+			return false
+		end,
+		shouldStart = function(creep)
+			return creep.store:getUsedCapacity("energy") > 0 and existsConstructionSite(creep)
+		end,
+		getPriority = function(creep)
+			return 5 / (creep.pos:getRangeTo(findConstructionSite(creep))*DISTANCE_WEIGHT)
+		end,
 	},
 }
 
+-- TODO: This isn't working, calling from JS breaks the WASM runtime
+-- function Global.getPriority(task, creep)
+-- 	return tasks[task].getPriority(creep)
+-- end
 
 return function(creep)
-	print("Hi!")
-
 	local currentTask = tasks[creep.memory.task]
 
 	if currentTask == nil then
 		local availableTasks = {}
+		local sumWeight = 0
 		for name, task in pairs(tasks) do
 			if task.shouldStart(creep) then
-				table.insert(availableTasks, {name, task})
+				local priority = task.getPriority(creep)
+				if math.validNumber(priority) then
+					sumWeight = sumWeight + priority
+					table.insert(availableTasks, {name, task, priority})
+				else
+					print_warn("Got invalid number priority " .. tostring(priority) .. " from task " .. name)
+				end
 			end
 		end
 		if #availableTasks > 0 then
-			local taskPair = availableTasks[math.random(1, #availableTasks)]
-			creep.memory.task = taskPair[1]
-			currentTask = taskPair[2]
+			local taskInfo
+			if #availableTasks == 1 then
+				taskInfo = availableTasks[1]
+			else
+				local weights = {}
+				if PRINT_PRIORITY then
+					print(("- Task priorities for creep @ %.0f, %.0f -"):format(creep.pos.x, creep.pos.y))
+				end
+				for _, v in ipairs(availableTasks) do
+					local priorityPercent = v[3] / sumWeight
+					weights[v] = priorityPercent
+					if PRINT_PRIORITY then
+						print(("%s : %.0f%% @ %.2f"):format(v[1], priorityPercent*100, v[3]))
+					end
+				end
+				taskInfo = in_place_random(availableTasks, weights)()
+			end
+			if taskInfo ~= nil then
+				creep.memory.task = taskInfo[1]
+				currentTask = taskInfo[2]
+			else
+				print_error("Weighted random returned nil!?")
+				return
+			end
 		end
 	end
 	if currentTask == nil then
-		print("Creep " .. tostring(creep) .. " has no task to do!")
+		-- print_warn("Creep " .. tostring(creep) .. " has no task to do!")
 		return
 	end
 	if currentTask.update(creep) then

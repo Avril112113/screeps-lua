@@ -20,3 +20,6 @@ LowDash = {}
 
 -- ScreepsLua
 JS = {}
+
+-- JS or Screeps provided?
+Global = {}

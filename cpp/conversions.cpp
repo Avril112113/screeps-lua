@@ -90,7 +90,6 @@ static emscripten::val convert_to_js(lua_State* L, int n) {
 		JSObject* object = JSObject::fromUserdata(L, n);
 		return object->_value;
 	} else if (lua_isfunction(L, n) || lua_iscfunction(L, n)) {
-		// std::cerr << "Lua function to JS isn't supported yet ;(\n";
 		lua_State* co = lua_newthread(L);
 		lua_pushvalue(L, n);
 		lua_xmove(L, co, 1);

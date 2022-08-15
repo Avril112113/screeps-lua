@@ -2,7 +2,7 @@
 
 const STARTUP_ATTEMPT_COUNT = 4;
 const BUCKET_CPU_REQUIREMENT = 500*STARTUP_ATTEMPT_COUNT;
-const LOOP_CPU_REQUIREMENT = 20;
+const LOOP_CPU_REQUIREMENT = 100;
 
 if (Memory.startup === undefined || Memory.startup == 0) {
 	if (Game.cpu.bucket < BUCKET_CPU_REQUIREMENT) {
@@ -19,16 +19,33 @@ if (Memory.startup === undefined || Memory.startup == 0) {
 let LuaModule = require("lua_module");
 let WASMBinary = require("lua");
 
-let lua = new LuaModule({
-	wasmBinary: WASMBinary,
-	print: function(msg) {
-		console.log(msg);
-	},
-	printErr: function(msg) {
-		console.log("<span style='color:#FF6F6B;'>" + msg + "</span>");
-	},
-});
-let hasInitialised = false;
+let lua;
+function loadWASM() {
+	console.log("Loading WASM module.");
+
+	lua = new LuaModule({
+		wasmBinary: WASMBinary,
+		print: function(msg) {
+			console.log(msg);
+		},
+		printErr: function(msg) {
+			console.log("<span style='color:#FF6F6B;'>" + msg + "</span>");
+		},
+	});
+
+	global.Lua = {
+		_wasm: lua,
+		eval: lua.cwrap("eval", null, ["string"]),
+	}
+
+	let result = lua._init();
+	if (result != 0) {
+		throw new Error("Failed to initialise Lua script.");
+	}
+
+	console.log("Initialised state.");
+}
+loadWASM();
 
 global._luaJS = {
 	Object: Object,
@@ -36,9 +53,12 @@ global._luaJS = {
 	JSON: JSON,
 }
 
-global.Lua = {
-	_wasm: lua,
-	eval: lua.cwrap("eval", null, ["string"]),
+global.bodyCost = function(body) {
+	let cost = 0;
+	body.forEach(part => {
+		cost += BODYPART_COST[part];
+	});
+	return cost;
 }
 
 module.exports.loop = function() {
@@ -46,23 +66,18 @@ module.exports.loop = function() {
 		console.log("<span style='color:#FF6F6B;'>Not enough cpu to run loop. (tickLimit requirement " + Game.cpu.tickLimit + "/" + LOOP_CPU_REQUIREMENT + " not satisfied)</span>");
 		return;
 	}
-	if (!hasInitialised) {
-		// We initialise on the 2nd tick because we spent a lot of time already loading the WASM
-		let result = lua._init();
-		if (result != 0) {
-			throw new Error("Failed to initialise Lua script.");
-		} else {
-			console.log("Loaded ScreepsLua.");
-		}
-		hasInitialised = true;
+	try {
+		lua._loop();
+	} catch (e) {
+		// Oh no...
+		console.log("<span style='color:#FF6F6B;'>" + e.stack + "</span>");
+		delete lua;
+		loadWASM();
 	}
-	lua._loop();
 }
 
 // Ignore this function, just figuring out methods
-function t() {
-	// Chicken?
-	Source().room.lookForAtArea()
+function _() {
 }
 
 //*/

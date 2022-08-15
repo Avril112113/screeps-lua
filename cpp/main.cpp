@@ -41,6 +41,8 @@ static void luascreeps_setup(lua_State* L) {
 	// This is ran once along with `luaL_openlibs`
 	JSObject_new(L, emscripten::val::global("_luaJS"));
 	lua_setglobal(L, "JS");
+	JSObject_new(L, emscripten::val::global("global"));
+	lua_setglobal(L, "Global");
 }
 
 static void luascreeps_setup_tick(lua_State* L) {
