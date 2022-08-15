@@ -3,3 +3,4 @@ Lua: Probably good idea to handle when the creep runs outa resources to do a ear
 	 Or if that isn't the issue, find and run the next task if one just finished
 Lua: Repairing of structures, if no turret present, it's a creep task
 Lua: Turret tasks
+Probably should consider better practice with .cpp and .hpp. (I'm just really lazy)

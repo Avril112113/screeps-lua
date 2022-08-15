@@ -18,6 +18,7 @@ if (Memory.startup === undefined || Memory.startup == 0) {
 
 let LuaModule = require("lua_module");
 let WASMBinary = require("lua");
+let LuaFiles = require("lua_files");
 
 let lua;
 function loadWASM() {
@@ -32,6 +33,8 @@ function loadWASM() {
 			console.log("<span style='color:#FF6F6B;'>" + msg + "</span>");
 		},
 	});
+
+	LuaFiles.write(lua.FS);
 
 	global.Lua = {
 		_wasm: lua,
