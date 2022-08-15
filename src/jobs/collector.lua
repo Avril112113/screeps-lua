@@ -59,11 +59,11 @@ local function isSourceValid(source, creep)
 end
 local function findAvailableSource(creep)
 	local sources = creep.room:find(105)
-	sources = LowDash:sortBy(sources, function(source)
-		return creep.pos:getRangeTo(source)
-	end)
 	sources = sources:filter(function(source, index, array)
 		return isSourceValid(source, creep)
+	end)
+	sources = LowDash:sortBy(sources, function(source)
+		return creep.pos:getRangeTo(source)
 	end)
 	return sources[1]
 end
@@ -139,6 +139,9 @@ local tasks = {
 			local structure
 			if creep.memory.targetStructure ~= nil then
 				structure = Game:getObjectById(creep.memory.targetStructure)
+			end
+			if structure ~= nil and structure.store:getFreeCapacity("energy") <= 0 then
+				structure = nil
 			end
 			if creep.memory.targetStructure == nil then
 				structure = findBestSpawnOrExtension(creep)
