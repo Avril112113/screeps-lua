@@ -1,4 +1,4 @@
-local jobs = require "jobs"
+local Tasking = require "tasking"
 
 
 local function bodyCost(body)
@@ -56,7 +56,7 @@ function Script.loop()
 
 	for _, creep in pairs(Game.creeps) do
 		Logging.setContext("creep", creep)
-		xpcall(jobs.collector, function(...) print_error(debug.traceback(...)) end, creep)
+		xpcall(Tasking.tasks_creep_general, function(...) print_error(debug.traceback(...)) end, creep)
 	end
 	Logging.setContext("creep", nil)
 
