@@ -67,6 +67,16 @@ local function findAvailableSource(creep)
 	end)
 	return sources[1]
 end
+local function findAvailableSourceGround(creep)
+	local sources = creep.room:find(118):concat(creep.room:find(106))
+	sources = sources:filter(function(source, index, array)
+		return source.resourceType == "energy" and source.amount > 0
+	end)
+	sources = LowDash:sortBy(sources, function(source)
+		return creep.pos:getRangeTo(source)
+	end)
+	return sources[1]
+end
 
 local function findBestSpawnOrExtension(creep)
 	local structures = creep.room:find(108)
@@ -93,6 +103,17 @@ local function findConstructionSite(creep)
 		return creep.pos:getRangeTo(source)
 	end)
 	return sites[1]
+end
+
+local function findRepairStructure(creep)
+	local structures = creep.room:find(107)
+	structures = structures:filter(function(structure, index, array)
+		return structure.hits ~= structure.hitsMax
+	end)
+	structures = LowDash:sortBy(structures, function(structure)
+		return structure.hits/structure.hitsMax * math.max(1 - creep.pos:getRangeTo(structure) * 1/25, 1)
+	end)
+	return structures[1]
 end
 
 
@@ -132,7 +153,45 @@ local tasks = {
 			return creep.store:getUsedCapacity("energy") == 0 and findAvailableSource(creep) ~= nil
 		end,
 		getPriority = function(creep)
-			return 1 / (creep.pos:getRangeTo(findAvailableSource(creep))*DISTANCE_WEIGHT)
+			return 1 / math.max(creep.pos:getRangeTo(findAvailableSource(creep))*DISTANCE_WEIGHT, 1)
+		end,
+	},
+	collectGround = {
+		update = function(creep)
+			local source
+			if creep.memory.targetSource ~= nil then
+				source = Game:getObjectById(creep.memory.targetSource)
+			end
+			if source ~= nil and source.energy <= 0 and source.ticksToRegeneration > 25 then
+				source = nil
+			end
+			if creep.memory.targetSource == nil then
+				source = findAvailableSourceGround(creep)
+				if source ~= nil then
+					creep.memory.targetSource = source.id
+				end
+			end
+			if source == nil then
+				if creep.memory.targetSource ~= nil then
+					creep.memory:_delete("targetSource")
+				end
+				return true
+			end
+			local result = creep:pickup(source)
+			if result == -9 or (result == -6 and not (math.abs(creep.pos.x - source.pos.x) <= 1 and math.abs(creep.pos.y - source.pos.y) <= 1)) then
+				creep:moveTo(source, {visualizePathStyle={stroke="#ffff00"}})
+			end
+			if creep.store:getFreeCapacity("energy") == 0 or source.amount <= 0 then
+				creep.memory:_delete("targetSource")
+				return true
+			end
+			return false
+		end,
+		shouldStart = function(creep)
+			return creep.store:getUsedCapacity("energy") == 0 and findAvailableSourceGround(creep) ~= nil
+		end,
+		getPriority = function(creep)
+			return 3 / math.max(creep.pos:getRangeTo(findAvailableSourceGround(creep))*DISTANCE_WEIGHT, 1)
 		end,
 	},
 	transferSpawn = {
@@ -158,7 +217,7 @@ local tasks = {
 			end
 			local result = creep:transfer(structure, "energy")
 			if result == -9 then
-				creep:moveTo(structure, {visualizePathStyle={stroke="#469ADB"}})
+				creep:moveTo(structure, {visualizePathStyle={stroke="#D84800"}})
 			end
 			if result == -8 or creep.store:getUsedCapacity("energy") == 0 then
 				creep.memory:_delete("targetStructure")
@@ -172,11 +231,11 @@ local tasks = {
 		getPriority = function(creep)
 			local creepCount = #creep.room:find(102)
 			return (
-					creepCount <= 4 and 20 or
-					creepCount <= 8 and 10 or
-					creepCount < 12 and 5 or
-					0
-				) / (creep.pos:getRangeTo(findBestSpawnOrExtension(creep))*DISTANCE_WEIGHT)
+					creepCount <= 4 and 25 or
+					creepCount <= 8 and 20 or
+					creepCount < 12 and 7 or
+					3
+				) / math.max(creep.pos:getRangeTo(findBestSpawnOrExtension(creep))*DISTANCE_WEIGHT, 1)
 		end,
 	},
 	upgradeController = {
@@ -191,8 +250,8 @@ local tasks = {
 			return creep.store:getUsedCapacity("energy") > 0
 		end,
 		getPriority = function(creep)
-			return (5 + (creep.room.controller.ticksToDowngrade < 15000 and creep.room.controller.ticksToDowngrade / 15000 * 100 or 0))
-					/ (creep.pos:getRangeTo(creep.room.controller)*DISTANCE_WEIGHT)
+			return (3 + (creep.room.controller.ticksToDowngrade < 15000 and creep.room.controller.ticksToDowngrade / 15000 * 100 or 0))
+					/ math.max(creep.pos:getRangeTo(creep.room.controller)*DISTANCE_WEIGHT, 1)
 		end,
 	},
 	build = {
@@ -215,7 +274,7 @@ local tasks = {
 			end
 			local result = creep:build(constructionSite)
 			if result == -9 then
-				creep:moveTo(constructionSite, {visualizePathStyle={stroke="#ffff44"}})
+				creep:moveTo(constructionSite, {visualizePathStyle={stroke="#00FF00"}})
 			end
 			if creep.store:getUsedCapacity("energy") <= 0 or Game:getObjectById(creep.memory.targetConstructionSite) == nil then
 				creep.memory:_delete("targetConstructionSite")
@@ -227,7 +286,43 @@ local tasks = {
 			return creep.store:getUsedCapacity("energy") > 0 and existsConstructionSite(creep)
 		end,
 		getPriority = function(creep)
-			return 5 / (creep.pos:getRangeTo(findConstructionSite(creep))*DISTANCE_WEIGHT)
+			return 5 / math.max(creep.pos:getRangeTo(findConstructionSite(creep))*DISTANCE_WEIGHT, 1)
+		end,
+	},
+	repair = {
+		update = function(creep)
+			local structure
+			if creep.memory.targetRepairStructure ~= nil then
+				structure = Game:getObjectById(creep.memory.targetRepairStructure)
+			end
+			if creep.memory.targetRepairStructure == nil then
+				structure = findRepairStructure(creep)
+				if structure ~= nil then
+					creep.memory.targetRepairStructure = structure.id
+				end
+			end
+			if structure == nil then
+				if creep.memory.targetRepairStructure ~= nil then
+					creep.memory:_delete("targetRepairStructure")
+				end
+				return true
+			end
+			local result = creep:repair(structure)
+			if result == -9 then
+				creep:moveTo(structure, {visualizePathStyle={stroke="#0008FF"}})
+			end
+			if creep.store:getUsedCapacity("energy") <= 0 or structure.hits == structure.hitsMax then
+				creep.memory:_delete("targetRepairStructure")
+				return true
+			end
+			return false
+		end,
+		shouldStart = function(creep)
+			return creep.store:getUsedCapacity("energy") > 0 and findRepairStructure(creep) ~= nil
+		end,
+		getPriority = function(creep)
+			local structure = findRepairStructure(creep)
+			return 15*(1-structure.hits/structure.hitsMax) / math.max(creep.pos:getRangeTo(structure)*DISTANCE_WEIGHT, 1)
 		end,
 	},
 }
