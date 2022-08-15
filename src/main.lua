@@ -22,7 +22,7 @@ function Script.loop()
 		local cost = bodyCost(body)
 		while true do
 			local part
-			if workCount == 2 and carryCount == 2 and moveCount == 1 then
+			if carryCount/2 >= moveCount then
 				part = MOVE
 				moveCount = moveCount + 1
 			elseif workCount > carryCount or cost + Global.BODYPART_COST[WORK] > maxCost then
@@ -42,6 +42,7 @@ function Script.loop()
 				break
 			end
 		end
+		table.sort(body)
 		local result = spawn:spawnCreep(body, ("Creep %.0f"):format(Game.time))
 		if result ~= 0 and result ~= -6 and result ~= -4 then
 			print_error("SPAWN " .. spawnName .. " ERROR: " .. result)

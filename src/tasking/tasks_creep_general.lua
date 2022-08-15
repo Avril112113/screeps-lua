@@ -40,7 +40,7 @@ end
 
 
 local function isSourceValid(source, creep)
-	if source.energy <= 0 then
+	if source.energy <= 0 and source.ticksToRegeneration > 25 then
 		return false
 	end
 	local pos = source.pos
@@ -103,7 +103,7 @@ local tasks = {
 			if creep.memory.targetSource ~= nil then
 				source = Game:getObjectById(creep.memory.targetSource)
 			end
-			if source ~= nil and source.energy <= 0 then
+			if source ~= nil and source.energy <= 0 and source.ticksToRegeneration > 25 then
 				source = nil
 			end
 			if creep.memory.targetSource == nil then
@@ -118,7 +118,8 @@ local tasks = {
 				end
 				return true
 			end
-			if creep:harvest(source) == -9 then
+			local result = creep:harvest(source)
+			if result == -9 or (result == -6 and not (math.abs(creep.pos.x - source.pos.x) <= 1 and math.abs(creep.pos.y - source.pos.y) <= 1)) then
 				creep:moveTo(source, {visualizePathStyle={stroke="#ffff00"}})
 			end
 			if creep.store:getFreeCapacity("energy") == 0 then
@@ -157,7 +158,7 @@ local tasks = {
 			end
 			local result = creep:transfer(structure, "energy")
 			if result == -9 then
-				creep:moveTo(structure, {visualizePathStyle={stroke="#728799"}})
+				creep:moveTo(structure, {visualizePathStyle={stroke="#469ADB"}})
 			end
 			if result == -8 or creep.store:getUsedCapacity("energy") == 0 then
 				creep.memory:_delete("targetStructure")
