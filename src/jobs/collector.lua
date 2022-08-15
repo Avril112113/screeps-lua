@@ -113,7 +113,7 @@ local tasks = {
 				end
 			end
 			if source == nil then
-				if creep.memory.targetSource == nil then
+				if creep.memory.targetSource ~= nil then
 					creep.memory:_delete("targetSource")
 				end
 				return true
@@ -150,7 +150,7 @@ local tasks = {
 				end
 			end
 			if structure == nil then
-				if creep.memory.targetStructure == nil then
+				if creep.memory.targetStructure ~= nil then
 					creep.memory:_delete("targetStructure")
 				end
 				return true
@@ -171,9 +171,9 @@ local tasks = {
 		getPriority = function(creep)
 			local creepCount = #creep.room:find(102)
 			return (
-					creepCount < 4 and 20 or
-					creepCount < 8 and 15 or
-					creepCount < 12 and 3 or
+					creepCount <= 4 and 20 or
+					creepCount <= 8 and 10 or
+					creepCount < 12 and 5 or
 					0
 				) / (creep.pos:getRangeTo(findBestSpawnOrExtension(creep))*DISTANCE_WEIGHT)
 		end,
@@ -270,6 +270,9 @@ return function(creep)
 					end
 				end
 				taskInfo = in_place_random(availableTasks, weights)()
+				if PRINT_PRIORITY then
+					print(("Picked: %s"):format(taskInfo[1]))
+				end
 			end
 			if taskInfo ~= nil then
 				creep.memory.task = taskInfo[1]

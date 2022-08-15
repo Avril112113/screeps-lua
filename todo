@@ -1,1 +1,3 @@
 Look into creating a custom FS so that Lua code can be updated without recompiling everything.
+Lua: Probably good idea to handle when the creep runs outa resources to do a earlier return
+	 Or if that isn't the issue, find and run the next task if one just finished
