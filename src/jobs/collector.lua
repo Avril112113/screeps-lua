@@ -83,6 +83,8 @@ local tasks = {
 
 
 return function(creep)
+	print("Hi!")
+
 	local currentTask = tasks[creep.memory.task]
 
 	if currentTask == nil then

@@ -1,5 +1,4 @@
 /* TODO List (there is also "todo"s scattered around the code)
-Fix odd issue with Logging contexts shomehow using log string instead of returned from context handler
 */
 
 #include "global.hpp"

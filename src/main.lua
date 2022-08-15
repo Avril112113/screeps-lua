@@ -11,10 +11,10 @@ function Script.loop()
 	end
 
 	for _, creep in pairs(Game.creeps) do
-		-- Logging.setContext("creep", creep)
+		Logging.setContext("creep", creep)
 		xpcall(jobs.collector, function(...) print_error(debug.traceback(...)) end, creep)
 	end
-	-- Logging.setContext("creep", nil)
+	Logging.setContext("creep", nil)
 
 	if Game.time % 10 then
 		for name, memory in pairs(Memory.creeps) do

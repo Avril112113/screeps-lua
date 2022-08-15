@@ -3,9 +3,9 @@
 require "screeps.api"
 require "screeps.logging"
 
--- Logging.registerContext("creep", function(creep)
--- 	return ("<Creep \"%s\">"):format(tostring(creep))
--- end)
+Logging.registerContext("creep", function(creep)
+	return ("creep=\"%s\""):format(creep and creep.name or "nil")
+end)
 
 Script = {}
 

@@ -48,9 +48,9 @@ function Logging._log(log_type, s, ...)
 	for context, value in pairs(Logging.setContexts) do
 		local contextHandler = Logging.contexts[context]
 		if contextHandler ~= nil then
-			local contextStr = contextHandler(value)
+			local contextStr = contextHandler(value):gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;")
 			if #contextStr > 0 then
-				table.insert(contextPrefixes, s)
+				table.insert(contextPrefixes, contextStr)
 			end
 		end
 	end
