@@ -5,7 +5,7 @@ call env.bat
 if exist "%BUILD_DIR%" rmdir "%BUILD_DIR%"
 mkdir "%BUILD_DIR%"
 
-call buildLua.bat
+python buildLua.py
 
 cmd /C emcc^
  --bind -sWASM=1 -sWASM_ASYNC_COMPILATION=0 -sMODULARIZE -O2 --no-entry^

@@ -20,4 +20,4 @@ In the future I **may** provide releases.
 ## How to use? (Linux)
 **Not tested** but should work... probably...  
 Since no `.sh` files are setup for linux, follow the windows instructions but manually run the relevant commands.  
-See: `build.bat`, `updateLua.bat`, `buildLua.bat` and `buildLua.py`. They are very simple.  
+See: `build.bat`, `updateLua.bat`, and `buildLua.py`. They are very simple.  
