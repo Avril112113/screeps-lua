@@ -88,16 +88,17 @@ public:
 
 	int __index(lua_State* L) {
 		// Stack: userdata<JSObject>, any(index)
-		if (lua_isstring(L, 2)) {
-			const char* index = lua_tostring(L, 2);
-			if (luaL_getmetafield(L, 1, index) > 0) {
+		emscripten::val index;
+		if (lua_isnumber(L, 2) && _value.isArray()) {
+			index = emscripten::val(lua_tonumber(L, 2) - 1);
+		} else if (lua_isstring(L, 2)) {
+			const char* indexStr = lua_tostring(L, 2);
+			if (luaL_getmetafield(L, 1, indexStr) > 0) {
 				// Stack: userdata<JSObject>, any(index), callable
 				return 1;
+			} else {
+				index = emscripten::val(indexStr);
 			}
-		}
-		emscripten::val index;
-		if (_value.isArray() && lua_isnumber(L, 2)) {
-			index = emscripten::val(lua_tonumber(L, 2) - 1);
 		} else {
 			index = convert_to_js(L, 2);
 		}
