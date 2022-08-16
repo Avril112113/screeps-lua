@@ -1,26 +1,22 @@
 //*
 
-const STARTUP_ATTEMPT_COUNT = 4;
-const BUCKET_CPU_REQUIREMENT = 500*STARTUP_ATTEMPT_COUNT;
+const MEMORY_HALT_THRESHOLD = 4;  // Remaining in MB
+const BUCKET_CPU_REQUIREMENT = 400;
 const LOOP_CPU_REQUIREMENT = 100;
 
-if (Memory.startup === undefined || Memory.startup == 0) {
-	if (Game.cpu.bucket < BUCKET_CPU_REQUIREMENT) {
-		// throw new Error("Not enough cpu to initialise. (bucket requirement " + Game.cpu.bucket + "/" + BUCKET_CPU_REQUIREMENT + " not satisfied)");
-		console.log("<span style='color:#FF6F6B;'>Not enough cpu to initialise. (bucket requirement " + Game.cpu.bucket + "/" + BUCKET_CPU_REQUIREMENT + " not satisfied)</span>");
-		return;
-	} else {
-		Memory.startup = STARTUP_ATTEMPT_COUNT;
-	}
-} else {
-	Memory.startup -= 1;
+// Future NOTE: For some dumb reason, console.log() doesn't work in `.then()` or `.catch()`, add items to a list and later log them.
+
+if (Game.cpu.bucket < BUCKET_CPU_REQUIREMENT) {
+	// throw new Error("Not enough cpu to initialise. (bucket requirement " + Game.cpu.bucket + "/" + BUCKET_CPU_REQUIREMENT + " not satisfied)");
+	console.log("<span style='color:#FF6F6B;'>Not enough cpu to initialise. (bucket requirement " + Game.cpu.bucket + "/" + BUCKET_CPU_REQUIREMENT + " not satisfied)</span>");
+	return;
 }
 
 let LuaModule = require("lua_module");
 let WASMBinary = require("lua");
 let LuaFiles = require("lua_files");
 
-let lua;
+let lua = null;
 function loadWASM() {
 	console.log("Loading WASM module.");
 
@@ -64,17 +60,26 @@ global.bodyCost = function(body) {
 	return cost;
 }
 
+
 module.exports.loop = function() {
 	if (Game.cpu.tickLimit < LOOP_CPU_REQUIREMENT) {
 		console.log("<span style='color:#FF6F6B;'>Not enough cpu to run loop. (tickLimit requirement " + Game.cpu.tickLimit + "/" + LOOP_CPU_REQUIREMENT + " not satisfied)</span>");
 		return;
 	}
+	if (Game.time % 10 == 0) {
+		let stats = Game.cpu.getHeapStatistics();
+		if (stats.total_available_size <= 1028*1028*MEMORY_HALT_THRESHOLD) {
+			console.log("<span style='color:#FF6F6B;'>Restarting due to up-coming memory issue... (memory leak?)</span>");
+			Game.cpu.halt();
+		}
+	}
+	
 	try {
 		lua._loop();
 	} catch (e) {
 		// Oh no...
 		console.log("<span style='color:#FF6F6B;'>" + e.stack + "</span>");
-		delete lua;
+		lua = null;
 		loadWASM();
 	}
 }
