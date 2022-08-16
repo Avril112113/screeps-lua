@@ -1,5 +1,6 @@
 local SPAWN_MAX_BODY_COUNT = 12
 local SPAWN_MAX_CREEPS = 12
+local PRINT_SPAWN = false
 
 
 local Tasking = require "tasking"
@@ -51,10 +52,9 @@ function Script.loop()
 			local result = spawn:spawnCreep(body, ("Creep %.0f"):format(Game.time))
 			if result ~= 0 and result ~= -6 and result ~= -4 then
 				print_error("SPAWN " .. spawnName .. " ERROR: " .. result)
-			elseif result == 0 then
+			elseif result == 0 and PRINT_SPAWN then
 				print_info("Spawned  creep that cost " .. bodyCost(body) .. "/" .. maxCost .. "/" .. spawn.room.energyCapacityAvailable .. " with [" .. table.concat(body, ", ") .. "]")
-			end
-			if result ~= 0 and spawn.room.energyCapacityAvailable == spawn.room.energyAvailable then
+			elseif result ~= 0 and spawn.room.energyCapacityAvailable == spawn.room.energyAvailable then
 				print_warn("At capacity of " .. spawn.room.energyCapacityAvailable .. " but no creep that cost " .. bodyCost(body) .. " with [" .. table.concat(body, ", ") .. "] spawned?")
 			end
 		end

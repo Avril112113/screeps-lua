@@ -1,4 +1,5 @@
 require "screeps.api"
+require "screeps.extras"
 require "screeps.logging"
 
 math.nan = 0/0

@@ -232,7 +232,7 @@ local tasks = {
 			local creepCount = #creep.room:find(102)
 			return (
 					creepCount <= 4 and 25 or
-					creepCount <= 8 and 20 or
+					creepCount <= 8 and 10 or
 					creepCount < 12 and 7 or
 					3
 				) / math.max(creep.pos:getRangeTo(findBestSpawnOrExtension(creep))*DISTANCE_WEIGHT, 1)
@@ -250,7 +250,7 @@ local tasks = {
 			return creep.store:getUsedCapacity("energy") > 0
 		end,
 		getPriority = function(creep)
-			return (3 + (creep.room.controller.ticksToDowngrade < 15000 and creep.room.controller.ticksToDowngrade / 15000 * 100 or 0))
+			return (3 + ((1 - creep.room.controller.ticksToDowngrade / CONTROLLER_TICKS_DOWNGRADE_BY_LEVEL[creep.room.controller.level]) * 100 or 0))
 					/ math.max(creep.pos:getRangeTo(creep.room.controller)*DISTANCE_WEIGHT, 1)
 		end,
 	},
