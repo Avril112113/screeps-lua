@@ -3,6 +3,9 @@ This is a simple project to get Lua running inside of screeps.
 Though this project was successful and works, there is no guarantee for safety, performance or consistency.  
 
 # How to use?
+Prerequisites:  
+- [`python`](https://www.python.org/) Any version should do.  
+
 Go to the [Releases](https://github.com/Dude112113/screeps-lua/releases) and download the latest release.  
 Extract the folder inside the downloaded ZIP to some memberable location and rename it.  
 Open the folder in vscode.  
@@ -24,7 +27,7 @@ If you plan on doing anything with the JS code and would like some degree of typ
 ## How to build? (Windows)
 Prerequisites:  
 - [`emscripten`](https://emscripten.org/) with `emcc` available.  
-- [`python`](https://www.python.org/)  
+- [`python`](https://www.python.org/) Any version should do.  
 
 Building:  
 - Modify `SCRIPT_SERVER` in `env.bat` to the server you wish to deploy (which can be found from `Open local folder`).  
