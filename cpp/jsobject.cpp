@@ -8,6 +8,15 @@
 static emscripten::val GLOBAL_OBJECT = emscripten::val::global("Object");
 
 class JSObjectPairs {
+public:
+	static JSObjectPairs* fromUserdata(lua_State* L, int n) {
+		// NOTE: we have NO safety, we don't check the userdata
+		return *reinterpret_cast<JSObjectPairs**>(lua_touserdata(L, n));
+	}
+	static JSObjectPairs* fromUserdata(lua_State* L) {
+		return fromUserdata(L, 1);
+	}
+
 private:
 	emscripten::val _value;
 	emscripten::val _keys;
@@ -42,6 +51,15 @@ public:
 
 		return 2;
 	}
+};
+static int JSObjectPairs___gc(lua_State* L){
+	delete JSObjectPairs::fromUserdata(L);
+	return 0;
+}
+luaL_Reg JSObjectPairs_reg[] =
+{
+	{ "__gc", &JSObjectPairs___gc },
+	{ NULL, NULL }
 };
 
 class JSObject {

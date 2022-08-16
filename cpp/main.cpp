@@ -1,6 +1,8 @@
 /* TODO List (there is also "todo"s scattered around the code)
 */
 
+#include <sanitizer/lsan_interface.h>
+
 #include "global.hpp"
 
 #include "screeps.hpp"  // TODO: remove this, it's not really needed.
@@ -110,6 +112,11 @@ extern int loop() {
 	}
 	luascreeps_cleanup_tick(L);
 	lua_pop(L, lua_gettop(L));
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+	__lsan_do_recoverable_leak_check();
+#endif
+#endif
 	return result;
 }
 
