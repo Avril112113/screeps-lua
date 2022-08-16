@@ -2,7 +2,7 @@
 
 call env.bat
 
-if exist "%BUILD_DIR%" rmdir "%BUILD_DIR%"
+if exist "%BUILD_DIR%" rmdir /s /q "%BUILD_DIR%"
 mkdir "%BUILD_DIR%"
 
 python buildLua.py
