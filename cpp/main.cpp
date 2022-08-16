@@ -6,7 +6,6 @@
 #include "screeps.hpp"  // TODO: remove this, it's not really needed.
 
 #include "main.hpp"
-
 // Include other cpp files, since I can't be arsed to build them all separately
 #include "forjs.cpp"
 #include "jsobject.cpp"

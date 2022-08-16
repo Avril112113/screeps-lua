@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.hpp"
+#include "conversions.hpp"
 #include "main.hpp"
 
 // This file is for methods used in the JS library `jslib.js` and NOT `main.js`

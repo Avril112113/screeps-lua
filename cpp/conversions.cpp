@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.hpp"
+#include "conversions.hpp"
 #include "main.hpp"
 #include "jsobject.cpp"
 
@@ -90,8 +91,7 @@ static emscripten::val convert_to_js(lua_State* L, int n) {
 		JSObject* object = JSObject::fromUserdata(L, n);
 		return object->_value;
 	} else if (lua_isfunction(L, n) || lua_iscfunction(L, n)) {
-		// TODO: We never free `co`, this is very bad memory leak
-		lua_State* co = lua_newthread(L);
+		lua_State* co = lua_newthread(L);  // freed by Lua
 		lua_pushvalue(L, n);
 		lua_xmove(L, co, 1);
 		emscripten::val statePtr = emscripten::val(reinterpret_cast<size_t>(co));
