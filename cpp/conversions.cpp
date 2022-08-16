@@ -90,10 +90,11 @@ static emscripten::val convert_to_js(lua_State* L, int n) {
 		JSObject* object = JSObject::fromUserdata(L, n);
 		return object->_value;
 	} else if (lua_isfunction(L, n) || lua_iscfunction(L, n)) {
+		// TODO: We never free `co`, this is very bad memory leak
 		lua_State* co = lua_newthread(L);
 		lua_pushvalue(L, n);
 		lua_xmove(L, co, 1);
-		emscripten::val statePtr = emscripten::val(reinterpret_cast<int>(co));
+		emscripten::val statePtr = emscripten::val(reinterpret_cast<size_t>(co));
 		emscripten::val cb = emscripten::val::take_ownership(wrapLuaFunction(statePtr.as_handle()));
 		return cb;
 	}

@@ -11,7 +11,7 @@ extern emscripten::EM_VAL callWrappedLuaFunction(emscripten::EM_VAL statePtrHand
 	emscripten::val statePtr = emscripten::val::take_ownership(statePtrHandle);
 	emscripten::val args = emscripten::val::take_ownership(argsHandle);
 	
-	lua_State* L = reinterpret_cast<lua_State*>(statePtr.as<int>());
+	lua_State* L = reinterpret_cast<lua_State*>(statePtr.as<size_t>());
 	// Stack: callable
 	lua_pushvalue(L, 1);  // Copy the function, since lua_call consumes and this might be called many times
 	// Stack: callable, callable
