@@ -61,6 +61,24 @@ function Script.loop()
 		spawn.room.visual:text(tostring(creepCount), spawn.pos)
 	end
 
+	Game.towers = LowDash:filter(Game.structures, function(structure)
+		return structure.structureType == "tower" and structure.my == true
+	end)
+	if Memory.towers == nil then
+		Memory.towers = Global.Object:create(nil)
+	end
+	for _, tower in pairs(Game.towers) do
+		Logging.setContext("tower", tower)
+		local memory = Memory.towers[tower.id]
+		if memory == nil then
+			memory = Global.Object:create(nil)
+			Memory.towers[tower.id] = memory
+		end
+		tower.memory = memory
+		xpcall(Tasking.tasks_tower_general, function(...) print_error(debug.traceback(...)) end, tower)
+	end
+	Logging.setContext("tower", nil)
+
 	for _, creep in pairs(Game.creeps) do
 		Logging.setContext("creep", creep)
 		xpcall(Tasking.tasks_creep_general, function(...) print_error(debug.traceback(...)) end, creep)
@@ -68,6 +86,11 @@ function Script.loop()
 	Logging.setContext("creep", nil)
 
 	if Game.time % 10 then
+		for id, memory in pairs(Memory.towers) do
+			if Game.towers[id] == nil then
+				Memory.towers:_delete(id)
+			end
+		end
 		for name, memory in pairs(Memory.creeps) do
 			if Game.creeps[name] == nil then
 				Memory.creeps:_delete(name)

@@ -2,43 +2,6 @@ local DISTANCE_WEIGHT = 1/10
 local PRINT_PRIORITY = false
 
 
--- From: https://github.com/kennyledet/Algorithm-Implementations/blob/master/Weighted_Random_Distribution/Lua/Yonaba/weighted_random.lua
--- items   : an array-list of values
--- weights : a map table holding the weight for each value in
---  in the `items` list.
--- returns : an iterator function
-local function expanding_random(items, weights)
-	local list = {}
-	for _, item in ipairs(items) do
-		local n = weights[item] * 100
-		for i = 1, n do table.insert(list, item) end
-	end
-	return function()
-		return list[math.random(1, #list)]
-	end
-end
-
--- From: https://github.com/kennyledet/Algorithm-Implementations/blob/master/Weighted_Random_Distribution/Lua/Yonaba/weighted_random.lua
--- items   : an array-list of values
--- weights : a map table holding the weight for each value in
---  in the `items` list.
--- returns : an iterator function
-local function in_place_random(items, weights)
-	local partial_sums, partial_sum = {}, 0
-	for _, item in ipairs(items) do
-		partial_sum = partial_sum + weights[item]
-		table.insert(partial_sums, partial_sum)
-	end
-	return function()
-		local n, s = math.random(), 0
-		for i, si in ipairs(partial_sums) do
-			s = s + si
-			if si > n then return items[i] end
-		end
-	end
-end
-
-
 local function isSourceValid(source, creep)
 	if source.energy <= 0 and source.ticksToRegeneration > 25 then
 		return false
@@ -80,7 +43,7 @@ end
 
 local function findBestSpawnOrExtension(creep)
 	local structures = creep.room:find(108)
-	structures = structures:filter(function(structure, index, array)
+	structures = structures:filter(function(structure)
 		local structureType = structure.structureType
 		if structureType == "spawn" or structureType == "extension" then
 			return (structure.store:getFreeCapacity("energy") or 0) > 0
@@ -107,13 +70,29 @@ end
 
 local function findRepairStructure(creep)
 	local structures = creep.room:find(107)
-	structures = structures:filter(function(structure, index, array)
+	structures = structures:filter(function(structure)
 		return structure.hits ~= structure.hitsMax
 	end)
 	structures = LowDash:sortBy(structures, function(structure)
 		return structure.hits/structure.hitsMax * math.max(1 - creep.pos:getRangeTo(structure) * 1/25, 1)
 	end)
 	return structures[1]
+end
+
+local function getTowersRoom(creep)
+	local towers = creep.room:find(108)
+	towers = towers:filter(function(structure)
+		return structure.structureType == "tower"
+	end)
+	towers = LowDash:sortBy(towers, function(structure)
+		return creep.pos:getRangeTo(structure)
+	end)
+	return towers
+end
+local function findTowerTransfer(creep)
+	return getTowersRoom(creep):filter(function(tower)
+		return (tower.store:getFreeCapacity("energy") or 0) > 0
+	end)[1]
 end
 
 
@@ -289,7 +268,8 @@ local tasks = {
 			return creep.store:getUsedCapacity("energy") > 0 and existsConstructionSite(creep)
 		end,
 		getPriority = function(creep)
-			return 5 / math.max(creep.pos:getRangeTo(findConstructionSite(creep))*DISTANCE_WEIGHT, 1)
+			local constructionSite = findConstructionSite(creep)
+			return 5 / math.max((constructionSite and creep.pos:getRangeTo(constructionSite) or 0)*DISTANCE_WEIGHT, 1)
 		end,
 	},
 	repair = {
@@ -321,11 +301,49 @@ local tasks = {
 			return false
 		end,
 		shouldStart = function(creep)
-			return creep.store:getUsedCapacity("energy") > 0 and findRepairStructure(creep) ~= nil
+			return #getTowersRoom(creep) <= 0 and creep.store:getUsedCapacity("energy") > 0 and findRepairStructure(creep) ~= nil
 		end,
 		getPriority = function(creep)
 			local structure = findRepairStructure(creep)
-			return 15*(1-structure.hits/structure.hitsMax) / math.max(creep.pos:getRangeTo(structure)*DISTANCE_WEIGHT, 1)
+			return 15 * (1-structure.hits/structure.hitsMax) / math.max(creep.pos:getRangeTo(structure)*DISTANCE_WEIGHT, 1)
+		end,
+	},
+	transferTower = {
+		update = function(creep)
+			local tower
+			if creep.memory.targetTower ~= nil then
+				tower = Game:getObjectById(creep.memory.targetTower)
+			end
+			if tower ~= nil and tower.store:getFreeCapacity("energy") <= 0 then
+				tower = nil
+			end
+			if creep.memory.targetTower == nil then
+				tower = findTowerTransfer(creep)
+				if tower ~= nil then
+					creep.memory.targetTower = tower.id
+				end
+			end
+			if tower == nil then
+				if creep.memory.targetTower ~= nil then
+					creep.memory:_delete("targetTower")
+				end
+				return true
+			end
+			local result = creep:transfer(tower, "energy")
+			if result == -9 then
+				creep:moveTo(tower, {visualizePathStyle={stroke="#D84800"}})
+			end
+			if result == -8 or creep.store:getUsedCapacity("energy") == 0 then
+				creep.memory:_delete("targetTower")
+				return true
+			end
+			return false
+		end,
+		shouldStart = function(creep)
+			return #getTowersRoom(creep) > 0 and creep.store:getUsedCapacity("energy") > 0 and findTowerTransfer(creep) ~= nil
+		end,
+		getPriority = function(creep)
+			return 15 * math.max(creep.pos:getRangeTo(findTowerTransfer(creep))*DISTANCE_WEIGHT, 1)
 		end,
 	},
 }
@@ -368,7 +386,7 @@ return function(creep)
 						print(("%s : %.0f%% @ %.2f"):format(v[1], priorityPercent*100, v[3]))
 					end
 				end
-				taskInfo = in_place_random(availableTasks, weights)()
+				taskInfo = math.inPlaceRandom(availableTasks, weights)()
 				if PRINT_PRIORITY then
 					print(("Picked: %s"):format(taskInfo[1]))
 				end
