@@ -250,7 +250,10 @@ local tasks = {
 			return creep.store:getUsedCapacity("energy") > 0
 		end,
 		getPriority = function(creep)
-			return (3 + ((1 - creep.room.controller.ticksToDowngrade / CONTROLLER_TICKS_DOWNGRADE_BY_LEVEL[creep.room.controller.level]) * 100 or 0))
+			local maxDowngradeTicks = CONTROLLER_TICKS_DOWNGRADE_BY_LEVEL[creep.room.controller.level]
+			local downgradeTicks = creep.room.controller.ticksToDowngrade
+			local downgradeTicksMissing = maxDowngradeTicks - maxDowngradeTicks
+			return (3 + (downgradeTicksMissing > 1000 and (downgradeTicksMissing / maxDowngradeTicks) * 100 or 0))
 					/ math.max(creep.pos:getRangeTo(creep.room.controller)*DISTANCE_WEIGHT, 1)
 		end,
 	},
