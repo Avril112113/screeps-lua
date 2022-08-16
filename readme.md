@@ -10,7 +10,7 @@ Prerequisites:
 - [`python`](https://www.python.org/)  
 
 Building:  
-- Modify `SCRIPT_DIR` in `env.bat` to the directory where to output the final files.  
+- Modify `SCRIPT_SERVER` in `env.bat` to the server you wish to deploy (which can be found from `Open local folder`).  
 - Run `build.bat` to build the JS and WASM code. (This also updates `src/`)  
 
 Once built, any changes in `src/` can be updated quickly by running `updateLua.bat`.  
