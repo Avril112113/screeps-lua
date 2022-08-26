@@ -32,10 +32,9 @@ int JSObject::lua_push(lua_State* L) {
 void JSObject::flush_cache() {
 	lua_State* L = get_global_state();
 	if (cache.size() > 0) {
-		for (auto it = this->cache.begin(); it != this->cache.end(); it++)
-		{
-			it->second->flush_cache();
-			lua_pushlightuserdata(L, (void*)it->second);
+		for (auto pair : cache) {
+			pair.second->flush_cache();
+			lua_pushlightuserdata(L, (void*)pair.second);
 			lua_pushnil(L);
 			lua_settable(L, LUA_REGISTRYINDEX);
 		}

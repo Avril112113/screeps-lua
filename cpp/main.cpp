@@ -36,14 +36,14 @@ static void screepslua_tick_setup(lua_State* L) {
 }
 
 static void screepslua_tick_free(lua_State* L) {
-	for (auto it = jsglobals.begin(); it != jsglobals.end(); it++)
+	for (auto pair : jsglobals)
 	{
-		it->second->flush_cache();
-		lua_pushlightuserdata(L, (void*)it->second);
+		pair.second->flush_cache();
+		lua_pushlightuserdata(L, (void*)pair.second);
 		lua_pushnil(L);
 		lua_settable(L, LUA_REGISTRYINDEX);
 		lua_pushnil(L);
-		lua_setglobal(L, it->first);
+		lua_setglobal(L, pair.first);
 	}
 	jsglobals.empty();
 }
