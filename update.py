@@ -114,6 +114,7 @@ def create_project(srcpath: str):
 	if not os.path.isfile("servers.json"):
 		shutil.copy(f"{SCREEPS_LUA_PATH}servers.json", "./")
 	if not os.path.isdir("build"):
+		os.mkdir("./build")
 		shutil.copy(f"{SCREEPS_LUA_PATH}build/lua_wasm.wasm", "./build")
 		shutil.copy(f"{SCREEPS_LUA_PATH}build/lua_module.js", "./build")
 		shutil.copy(f"{SCREEPS_LUA_PATH}build/main.js", "./build")
