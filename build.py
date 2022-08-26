@@ -16,6 +16,11 @@ else:
 	SCREEPS_LUA_PATH = SCREEPS_LUA_PATH.replace("\\", "/") + "/"
 
 
+if not os.path.isdir(f"{SCREEPS_LUA_PATH}cpp"):
+	print(f"`build` shouldn't be run... \"{SCREEPS_LUA_PATH}\" isn't the screeps-lua source from {GIT_HUB_URL}", file=sys.stderr)
+	exit(1)
+
+
 # functions from C/C++ that are to be exported to use within JS ("_" prefix is required)
 EXPORTED_FUNCTIONS = [
 	# js_for.cpp

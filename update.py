@@ -113,12 +113,12 @@ def create_project(srcpath: str):
 		shutil.copytree(f"{SCREEPS_LUA_PATH}.vscode_starter", ".vscode")
 	if not os.path.isfile("servers.json"):
 		shutil.copy(f"{SCREEPS_LUA_PATH}servers.json", "./")
-	if os.path.isdir("build"):
-		shutil.rmtree("build")
-	os.mkdir("build")
-	shutil.copy(f"{SCREEPS_LUA_PATH}build/lua_wasm.wasm", "./build")
-	shutil.copy(f"{SCREEPS_LUA_PATH}build/lua_module.js", "./build")
-	shutil.copy(f"{SCREEPS_LUA_PATH}build/main.js", "./build")
+	if not os.path.isdir("build"):
+		shutil.copy(f"{SCREEPS_LUA_PATH}build/lua_wasm.wasm", "./build")
+		shutil.copy(f"{SCREEPS_LUA_PATH}build/lua_module.js", "./build")
+		shutil.copy(f"{SCREEPS_LUA_PATH}build/main.js", "./build")
+	else:
+		print(f"Skipped copying build as it exists. Please delete this directory and re-run if it's not within a release download or screeps-lua source.", file=sys.stderr)
 
 
 if __name__ == "__main__":
