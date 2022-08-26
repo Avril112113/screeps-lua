@@ -3,6 +3,4 @@
 #include "global.hpp"
 
 
-static int JSObject_new(lua_State* L, emscripten::val value);
-
-static void dumpstack(lua_State* L);
+lua_State* get_global_state();

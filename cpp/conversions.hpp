@@ -1,8 +1,10 @@
 #pragma once
 
 #include "global.hpp"
+#include "utils.hpp"
+#include "jsobject.hpp"
 
 
-static int convert_to_lua(lua_State* L, emscripten::val value);
+int convert_to_lua(lua_State* L, emscripten::val value, bool throwaway);
 
-static emscripten::val convert_to_js(lua_State* L, int n);
+emscripten::val convert_to_js(lua_State* L, int n);

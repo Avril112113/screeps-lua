@@ -1,10 +1,11 @@
 {
 	"C_Cpp.default.includePath": [
 		"C:/Users/dude/Desktop/ProgrammingProjects/c_cpp/emsdk/upstream/emscripten/system/**",
-		"C:/Users/dude/Desktop/ProgrammingProjects/Lua/ScreepsEmscripten/lua-5.4.4/src/**",
-		"./*"
+		"./include/**"
 	],
+	"C_Cpp.autoAddFileAssociations": false,
 	"cSpell.words": [
+		"jsobject",
 		"luascreeps"
 	]
 }

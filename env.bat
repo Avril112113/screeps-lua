@@ -1,6 +1,0 @@
-@echo off
-
-SET SCRIPT_SERVER=127_0_0_1___21025
-SET SCRIPT_BRANCH=default
-SET SCRIPT_DIR=%LocalAppData%\Screeps\scripts\%SCRIPT_SERVER%\%SCRIPT_BRANCH%
-SET BUILD_DIR=build

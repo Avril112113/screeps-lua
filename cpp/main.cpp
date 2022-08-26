@@ -1,143 +1,120 @@
-/* TODO List (there is also "todo"s scattered around the code)
-*/
-
-#include <sanitizer/lsan_interface.h>
-
-#include "global.hpp"
-
-#include "screeps.hpp"  // TODO: remove this, it's not really needed.
-
 #include "main.hpp"
-// Include other cpp files, since I can't be arsed to build them all separately
-#include "forjs.cpp"
-#include "jsobject.cpp"
-#include "conversions.cpp"
+#include "utils.hpp"
+#include "conversions.hpp"
+#include "jsobject.hpp"
+#include "jsobjectpairs.hpp"
 
-static void dumpstack(lua_State* L) {
-	int top=lua_gettop(L);
-	for (int i=1; i <= top; i++) {
-		printf("%d\t%s\t", i, luaL_typename(L,i));
-		switch (lua_type(L, i)) {
-			case LUA_TNUMBER:
-				printf("%g\n",lua_tonumber(L,i));
-				break;
-			case LUA_TSTRING:
-				printf("%s\n",lua_tostring(L,i));
-				break;
-			case LUA_TBOOLEAN:
-				printf("%s\n", (lua_toboolean(L, i) ? "true" : "false"));
-				break;
-			case LUA_TNIL:
-				printf("%s\n", "nil");
-				break;
-			default:
-				printf("%p\n",lua_topointer(L,i));
-				break;
+
+std::map<const char*, JSObject*> jsglobals;
+static void screepslua_setjsglobal(lua_State* L, const char* jsName, const char* luaName, bool cleanup=false) {
+	if (convert_to_lua(L, emscripten::val::global(jsName), !cleanup) > 0) {
+		if (cleanup) {
+			jsglobals[jsName] = JSObject::fromUserdata(L, -1);
 		}
+		lua_setglobal(L, luaName);
+	} else {
+		std::cerr << "Failed to set global `" << luaName << "`\n";
 	}
 }
 
-static void luascreeps_setup(lua_State* L) {
-	// Provide all needed methods for working with the JS environment
-	// This is ran once along with `luaL_openlibs`
-	JSObject_new(L, emscripten::val::global("_luaJS"));
-	lua_setglobal(L, "JS");
-	JSObject_new(L, emscripten::val::global("global"));
-	lua_setglobal(L, "Global");
+
+static void screepslua_init(lua_State* L) {
+	jsobject_init_reg(L);
+	jsobjectpairs_init_reg(L);
+
+	lua_newtable(L);
+	lua_setglobal(L, "Script");
+
+	screepslua_setjsglobal(L, "_", "LoDash");
+	screepslua_setjsglobal(L, "LuaLib", "JS");
+	screepslua_setjsglobal(L, "global", "JSGlobal");
 }
 
-static void luascreeps_setup_tick(lua_State* L) {
-	// Setup values that only exist for a loop/tick
-	JSObject_new(L, screeps::tick->Game);
-	lua_setglobal(L, "Game");
-	JSObject_new(L, screeps::tick->Memory);
-	lua_setglobal(L, "Memory");
-	JSObject_new(L, screeps::tick->PathFinder);
-	lua_setglobal(L, "PathFinder");
-	JSObject_new(L, screeps::tick->RawMemory);
-	lua_setglobal(L, "RawMemory");
+static void screepslua_tick_setup(lua_State* L) {
+	screepslua_setjsglobal(L, "Game", "Game", true);
+	screepslua_setjsglobal(L, "Memory", "Memory", true);
 }
 
-static void luascreeps_cleanup_tick(lua_State* L) {
-	// Clean-up everything we need after a tick has finished
-	lua_pushnil(L);
-	lua_setglobal(L, "Game");
-	lua_pushnil(L);
-	lua_setglobal(L, "Memory");
-	lua_pushnil(L);
-	lua_setglobal(L, "PathFinder");
-	lua_pushnil(L);
-	lua_setglobal(L, "RawMemory");
-	lua_gc(L, LUA_GCCOLLECT);
-}
-
-
-extern "C" {
-
-lua_State* L;
-
-const char* RUN_FILE = "/screeps/run.lua";
-extern int init() {
-	L = luaL_newstate();
-	luaL_openlibs(L);
-	luascreeps_setup(L);
-	JSObject_new(L, emscripten::val::global("_"));
-	lua_setglobal(L, "LowDash");
-	int result;
-	result = luaL_loadfile(L, RUN_FILE);
-	if (result != 0) {
-		std::cerr << "Failed to load `run.lua` " << lua_tostring(L, -1) << "'\n";
-		lua_close(L);
-		return result;
+static void screepslua_tick_free(lua_State* L) {
+	for (auto it = jsglobals.begin(); it != jsglobals.end(); it++)
+	{
+		it->second->flush_cache();
+		lua_pushlightuserdata(L, (void*)it->second);
+		lua_pushnil(L);
+		lua_settable(L, LUA_REGISTRYINDEX);
+		lua_pushnil(L);
+		lua_setglobal(L, it->first);
 	}
-	result = lua_pcall(L, 0, LUA_MULTRET, 0);
-	if (result != 0) {
-		std::cerr << "Error running `" << RUN_FILE << "`\n";
-		std::cerr << lua_tostring(L, -1) << "\n";
-		std::cout << "Stack size after pcall error: " << lua_gettop(L) << "\n";
-		return result;
-	}
-	return 0;
+	jsglobals.empty();
 }
 
-extern int loop() {
-	screeps::INIT();
-	luascreeps_setup_tick(L);
-	lua_getglobal(L, "Script");  // table(global.Script)
-	lua_getfield(L, -1, "loop");  // table(global.Script), function(Script.loop)
-	int result = lua_pcall(L, 0, LUA_MULTRET, 0);
-	if (result != 0) {
+
+lua_State* GlobalState;
+lua_State* get_global_state() {
+	return GlobalState;
+}
+
+
+extern "C" int init() {
+	// Create and setup the lua state
+	GlobalState = luaL_newstate();
+	luaL_openlibs(GlobalState);
+	screepslua_init(GlobalState);
+	// Run the `/screeps/run.lua` file
+	int status;
+	status = luaL_loadfile(GlobalState, RUN_FILE);
+	if (status != 0) {
+		std::cerr << "Failed to load `" RUN_FILE "` " << lua_tostring(GlobalState, -1) << "'\n";
+		lua_close(GlobalState);
+		return status;
+	}
+	status = screepslua_pcall(GlobalState, 0, LUA_MULTRET);
+	if (status != 0) {
+		std::cerr << "Error running `" RUN_FILE "`\n";
+		std::cerr << lua_tostring(GlobalState, -1) << "\n";
+		return status;
+	}
+	leak_check();
+	return status;
+}
+
+extern "C" int reload() {
+	if (!(GlobalState == nullptr)) {
+		lua_close(GlobalState);
+	}
+	return init();
+}
+
+
+
+extern "C" int loop() {
+	screepslua_tick_setup(GlobalState);
+	lua_getglobal(GlobalState, "Script");  // table(global.Script)
+	lua_getfield(GlobalState, -1, "loop");  // table(global.Script), function(Script.loop)
+	int status = screepslua_pcall(GlobalState, 0, LUA_MULTRET);
+	if (status != 0) {
 		std::cerr << "Error running `Script.loop()`\n";
-		std::cerr << lua_tostring(L, -1) << "\n";
+		std::cerr << lua_tostring(GlobalState, -1) << "\n";
+		return status;
 	}
-	luascreeps_cleanup_tick(L);
-	lua_pop(L, lua_gettop(L));
-#if defined(__has_feature)
-#if __has_feature(address_sanitizer)
-	__lsan_do_recoverable_leak_check();
-#endif
-#endif
-	return result;
+	screepslua_tick_free(GlobalState);
+	lua_gc(GlobalState, LUA_GCCOLLECT);
+	leak_check();
+	lua_pop(GlobalState, lua_gettop(GlobalState));
+	return status;
 }
 
-extern void eval(char* code) {
-	luascreeps_setup_tick(L);
-	int result;
-	result = luaL_loadstring(L, code); // Stack: callable(code)
-	if (result != 0) {
-		std::cerr << "Failed to load eval code " << lua_tostring(L, -1) << "'\n";
-		lua_close(L);
-		return;
+extern "C" int eval(char* code) {
+	screepslua_tick_setup(GlobalState);
+	luaL_loadstring(GlobalState, code);
+	int status = screepslua_pcall(GlobalState, 0, LUA_MULTRET);
+	if (status != 0) {
+		std::cerr << "Error running eval string\n";
+		std::cerr << lua_tostring(GlobalState, -1) << "\n";
+		return status;
 	}
-	result = lua_pcall(L, 0, LUA_MULTRET, 0);
-	if (result != 0) {
-		std::cerr << "Error running `Script.loop()`\n";
-		std::cerr << lua_tostring(L, -1) << "\n";
-	}
-	luascreeps_cleanup_tick(L);
-	dumpstack(L);
-	lua_pop(L, lua_gettop(L));
-	return;
-}
-
+	screepslua_tick_free(GlobalState);
+	lua_gc(GlobalState, LUA_GCCOLLECT);
+	leak_check();
+	return status;
 }

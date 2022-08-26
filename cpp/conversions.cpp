@@ -1,12 +1,7 @@
-#pragma once
-
-#include "global.hpp"
 #include "conversions.hpp"
-#include "main.hpp"
-#include "jsobject.cpp"
 
 
-static int convert_to_lua(lua_State* L, emscripten::val value) {
+int convert_to_lua(lua_State* L, emscripten::val value, bool throwaway) {
 	if (value.isNull() || value.isUndefined()) {
 		lua_pushnil(L);
 		return 1;	
@@ -20,18 +15,18 @@ static int convert_to_lua(lua_State* L, emscripten::val value) {
 		lua_pushstring(L, value.as<std::string>().c_str());
 		return 1;
 	} else if (value.isArray()) {
-		return JSObject_new(L, value);
+		return lua_pushjsobject(L, value, throwaway);
 	}
 	std::string type = value.typeOf().as<std::string>();
 	if (type == "object" || type == "function") {
-		return JSObject_new(L, value);
+		return lua_pushjsobject(L, value, throwaway);
 	}
 	std::cerr << "Failed to convert type " << type.c_str() << "\n";
 	lua_pushnil(L);
-	return 0;
+	return 1;
 }
 
-static emscripten::val convert_to_js(lua_State* L, int n) {
+emscripten::val convert_to_js(lua_State* L, int n) {
 	// Stack: ..., any@n, ...
 	if (lua_isnil(L, n)) {
 		return emscripten::val::null();
@@ -89,8 +84,9 @@ static emscripten::val convert_to_js(lua_State* L, int n) {
 		}
 	} else if (lua_isuserdata(L, n)) {
 		JSObject* object = JSObject::fromUserdata(L, n);
-		return object->_value;
-	} else if (lua_isfunction(L, n) || lua_iscfunction(L, n)) {
+		return object->value;
+	}
+	else if (lua_isfunction(L, n) || lua_iscfunction(L, n)) {
 		lua_State* co = lua_newthread(L);  // freed by Lua
 		lua_pushvalue(L, n);
 		lua_xmove(L, co, 1);

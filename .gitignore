@@ -1,4 +1,5 @@
-node_modules/**
-build/**
-release/**
-todo
+__pycache__/
+node_modules/
+build/
+src/
+test/

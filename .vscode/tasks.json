@@ -3,29 +3,78 @@
 	"tasks": [
 		{
 			"label": "Build WASM",
-			"command": "./build.bat",
-			"type": "shell",
-			"args": [],
+			"command": "python",
+			"type": "process",
+			"args": [
+				"build.py", "-u", "-p"
+			],
 			"presentation": {
 				"reveal": "always"
 			},
 			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
+				"kind": "build"
+			}
 		},
 		{
-			"label": "Update Lua",
-			"command": "./updateLua.bat",
-			"type": "shell",
-			"args": [],
+			"label": "Build JS (Skip WASM)",
+			"command": "python",
+			"type": "process",
+			"args": [
+				"build.py", "-u", "--skip_compile"
+			],
 			"presentation": {
 				"reveal": "always"
 			},
 			"group": {
-				"kind": "build",
-				"isDefault": false
+				"kind": "build"
 			}
+		},
+		{
+			"label": "Update",
+			"command": "python",
+			"type": "process",
+			"args": [
+				"update.py", "-u", "--js"
+			],
+			"presentation": {
+				"reveal": "always"
+			},
+			"group": {
+				"kind": "build"
+			}
+		},
+		{
+			"label": "screeps-launcher RUN",
+			"command": "${workspaceFolder}\\..\\screeps-launcher\\screeps-launcher_v1.14.0_windows_amd64.exe",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}\\..\\screeps-launcher\\"
+			},
+			"isBackground": true,
+			"presentation": {
+				"panel": "dedicated",
+				"reveal": "always",
+				"clear": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "screeps-launcher CLI",
+			"command": "${workspaceFolder}\\..\\screeps-launcher\\screeps-launcher_v1.14.0_windows_amd64.exe",
+			"args": [
+				"cli"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}\\..\\screeps-launcher\\"
+			},
+			"isBackground": true,
+			"presentation": {
+				"panel": "dedicated",
+				"reveal": "always",
+				"clear": true
+			},
+			"problemMatcher": []
 		}
 	]
 }
