@@ -4,7 +4,7 @@ It is advised to not rely on the performance or consistency of this project as i
 
 # How to use?
 Prerequisites:  
-- [`python3`](https://www.python.org/)  
+- [`python3`](https://www.python.org/) Only used for building/updating.  
 
 Quick usage examples:  
 - Update "`screeps-lua`"  
