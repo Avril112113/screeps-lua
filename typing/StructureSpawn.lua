@@ -1,0 +1,74 @@
+-- WARNING: THIS FILE IS GENERATED, DO NOT MODIFY.
+
+
+--- <p><img align="right" alt="" src="./Screeps Documentation_files/spawn.png"/> </p> <p>Spawn is your colony center. This structure can create, renew, and recycle creeps. All your spawns are accessible through <a href="https://docs.screeps.com/api/#Game.spawns"><code>Game.spawns</code></a> hash list. Spawns auto-regenerate a little amount of energy each tick, so that you can easily recover even if all your creeps died.</p> <table class="table gameplay-info"><tbody><tr><td colspan="2"><strong>Controller level</strong></td></tr><tr><td>1-6</td><td>1 spawn</td></tr><tr><td>7</td><td>2 spawns</td></tr><tr><td>8</td><td>3 spawns</td></tr><tr><td><strong>Cost</strong></td><td>15,000</td></tr><tr><td><strong>Hits</strong></td><td>5,000</td></tr><tr><td><strong>Capacity</strong></td><td>300</td></tr><tr><td><strong>Spawn time</strong></td><td>3 ticks per each body part</td></tr><tr><td><strong>Energy auto-regeneration</strong></td><td>1 energy unit per tick while energy available in the room (in all spawns and extensions) is less than 300</td></tr></tbody></table>
+---@class StructureSpawn
+--- <p>Applied effects, an array of objects with the following properties:</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>effect</code></td><td>number</td><td><p>Effect ID of the applied effect. Can be either natural effect ID or Power ID.</p></td></tr><tr><td><code>level</code><br/><em>optional</em></td><td>number </td><td><p>Power level of the applied effect. Absent if the effect is not a Power effect.</p></td></tr><tr><td><code>ticksRemaining</code></td><td>number</td><td><p>How many ticks will the effect last.</p></td></tr></tbody></table>
+---@field effects any[]
+--- <p>An object representing the position of this object in the room.</p>
+---@field pos RoomPosition
+--- <p>The link to the Room object. May be undefined in case if an object is a flag or a construction site and is placed in a room that is not visible to you.</p>
+---@field room Room
+--- <p>The current amount of hit points of the structure.</p>
+---@field hits number
+--- <p>The total amount of hit points of the structure.</p>
+---@field hitsMax number
+--- <p>A unique object identificator. You can use <a href="https://docs.screeps.com/api/#Game.getObjectById"><code>Game.getObjectById</code></a> method to retrieve an object instance by its <code>id</code>.</p>
+---@field id string
+--- <p>One of the <code>STRUCTURE_*</code> constants.</p>
+---@field structureType string
+--- <p>Whether this is your own structure.</p>
+---@field my boolean
+--- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#StructureExtension.store"><code>.store[RESOURCE_ENERGY]</code></a>.</p>
+---@field energy number
+--- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#Store.getCapacity"><code>.store.getCapacity(RESOURCE_ENERGY)</code></a>.</p>
+---@field energyCapacity number
+--- <p>A shorthand to <code>Memory.spawns[spawn.name]</code>. You can use it for quick access the spawn’s specific memory data object. <a href="https://docs.screeps.com/global-objects.html#Memory-object">Learn more about memory</a></p>
+---@field memory any
+--- <p>Spawn’s name. You choose the name upon creating a new spawn, and it cannot be changed later. This name is a hash key to access the spawn via the <a href="https://docs.screeps.com/api/#Game.spawns">Game.spawns</a> object.</p>
+---@field name string
+--- <p>If the spawn is in process of spawning a new creep, this object will contain a <a href="https://docs.screeps.com/api/#StructureSpawn-Spawning"><code>StructureSpawn.Spawning</code></a> object, or null otherwise.</p>
+---@field spawning StructureSpawn.Spawning
+--- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
+---@field store Store
+--- <p>Destroy this structure immediately.</p>
+---@field destroy fun()
+--- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
+---@field isActive fun()
+--- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>boolean</td><td><p>Whether to enable notification or disable.</p></td></tr></tbody></table>
+---@field notifyWhenAttacked fun(enabled:any)
+--- <div class="api-deprecated"><p>This method is deprecated and will be removed soon. Please use <a href="https://docs.screeps.com/api/#StructureSpawn.spawnCreep"><code>StructureSpawn.spawnCreep</code></a> with <code>dryRun</code> flag instead.</p></div> <p>Check if a creep can be created.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>body</code></td><td>array&lt;string&gt;</td><td><p>An array describing the new creep’s body. Should contain 1 to 50 elements with one of these constants:</p><ul><li><code>WORK</code></li><li><code>MOVE</code></li><li><code>CARRY</code></li><li><code>ATTACK</code></li><li><code>RANGED_ATTACK</code></li><li><code>HEAL</code></li><li><code>TOUGH</code></li><li><code>CLAIM</code></li></ul></td></tr><tr><td><code>name</code><br/><em>optional</em></td><td>string</td><td><p>The name of a new creep. The name length limit is 100 characters. It should be unique creep name, i.e. the <code>Game.creeps</code> object should not contain another creep with the same name (hash key). If not defined, a random name will be generated.</p></td></tr></tbody></table>
+---@field canCreateCreep fun(body:any,name:any?)
+--- <div class="api-deprecated"><p>This method is deprecated and will be removed soon. Please use <a href="https://docs.screeps.com/api/#StructureSpawn.spawnCreep"><code>StructureSpawn.spawnCreep</code></a> instead.</p></div> <p>Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>body</code></td><td>array&lt;string&gt;</td><td><p>An array describing the new creep’s body. Should contain 1 to 50 elements with one of these constants:</p><ul><li><code>WORK</code></li><li><code>MOVE</code></li><li><code>CARRY</code></li><li><code>ATTACK</code></li><li><code>RANGED_ATTACK</code></li><li><code>HEAL</code></li><li><code>TOUGH</code></li><li><code>CLAIM</code></li></ul></td></tr><tr><td><code>name</code><br/><em>optional</em></td><td>string</td><td><p>The name of a new creep. The name length limit is 100 characters. It should be unique creep name, i.e. the <code>Game.creeps</code> object should not contain another creep with the same name (hash key). If not defined, a random name will be generated.</p></td></tr><tr><td><code>memory</code><br/><em>optional</em></td><td>any</td><td><p>The memory of a new creep. If provided, it will be immediately stored into <code>Memory.creeps[name]</code>.</p></td></tr></tbody></table>
+---@field createCreep fun(body:any,name:any?,memory:any?)
+--- <p>Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>body</code></td><td>array&lt;string&gt;</td><td><p>An array describing the new creep’s body. Should contain 1 to 50 elements with one of these constants:</p><ul><li><code>WORK</code></li><li><code>MOVE</code></li><li><code>CARRY</code></li><li><code>ATTACK</code></li><li><code>RANGED_ATTACK</code></li><li><code>HEAL</code></li><li><code>TOUGH</code></li><li><code>CLAIM</code></li></ul></td></tr><tr><td><code>name</code></td><td>string</td><td><p>The name of a new creep. The name length limit is 100 characters. It must be a unique creep name, i.e. the <code>Game.creeps</code> object should not contain another creep with the same name (hash key).</p></td></tr><tr><td><code>opts</code><br/><em>optional</em></td><td>object</td><td><p>An object with additional options for the spawning process.</p><ul><li><div class="api-arg-title">memory</div><div class="api-arg-type">any</div><div class="api-arg-desc">Memory of the new creep. If provided, it will be immediately stored into <code>Memory.creeps[name]</code>.</div></li><li><div class="api-arg-title">energyStructures</div><div class="api-arg-type">array</div><div class="api-arg-desc">Array of spawns/extensions from which to draw energy for the spawning process. Structures will be used according to the array order.</div></li><li><div class="api-arg-title">dryRun</div><div class="api-arg-type">boolean</div><div class="api-arg-desc">If <code>dryRun</code> is true, the operation will only check if it is possible to create a creep.</div></li><li><div class="api-arg-title">directions</div><div class="api-arg-type">array<number></number></div><div class="api-arg-desc">Set desired directions where the creep should move when spawned. An array with the direction constants:                                          <ul><li><code>TOP</code></li><li><code>TOP_RIGHT</code></li><li><code>RIGHT</code></li><li><code>BOTTOM_RIGHT</code></li><li><code>BOTTOM</code></li><li><code>BOTTOM_LEFT</code></li><li><code>LEFT</code></li><li><code>TOP_LEFT</code></li></ul></div></li></ul></td></tr></tbody></table>
+---@field spawnCreep fun(body:any,name:any,opts:any?)
+--- <p>Kill the creep and drop up to 100% of resources spent on its spawning and boosting depending on remaining life time. The target should be at adjacent square. Energy return is limited to 125 units per body part.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>target</code></td><td><a href="https://docs.screeps.com/api/#Creep">Creep</a></td><td><p>The target creep object.</p></td></tr></tbody></table>
+---@field recycleCreep fun(target:any)
+--- <p>Increase the remaining time to live of the target creep. The target should be at adjacent square. The target should not have CLAIM body parts.The spawn should not be busy with the spawning process. Each execution increases the creep's timer by amount of ticks according to this formula: </p> <p>Energy required for each execution is determined using this formula: </p> <p>Renewing a creep removes all of its boosts.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>target</code></td><td><a href="https://docs.screeps.com/api/#Creep">Creep</a></td><td><p>The target creep object.</p></td></tr></tbody></table>
+---@field renewCreep fun(target:any)
+---@field owner StructureSpawn.owner
+---@field Spawning StructureSpawn.Spawning
+local StructureSpawn = {}
+
+--- <p>An object with the structure’s owner info containing the following properties:</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>username</code></td><td>string</td><td><p>The name of the owner user.</p></td></tr></tbody></table>
+---@class StructureSpawn.owner
+local owner = {}
+
+--- <p>Details of the creep being spawned currently that can be addressed by the <a href="https://docs.screeps.com/api/#StructureSpawn.spawning"><code>StructureSpawn.spawning</code></a> property.</p>
+---@class StructureSpawn.Spawning
+--- <p>An array with the spawn directions, see <a href="https://docs.screeps.com/api/#StructureSpawn.Spawning.setDirections"><code>StructureSpawn.Spawning.setDirections</code></a>.</p>
+---@field directions any[]
+--- <p>The name of a new creep.</p>
+---@field name string
+--- <p>Time needed in total to complete the spawning.</p>
+---@field needTime number
+--- <p>Remaining time to go.</p>
+---@field remainingTime number
+--- <p>A link to the spawn.</p>
+---@field spawn StructureSpawn
+--- <p>Cancel spawning immediately. Energy spent on spawning is not returned. </p>
+---@field cancel fun()
+--- <p>Set desired directions where the creep should move when spawned.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>directions</code></td><td>array&lt;number&gt;</td><td><p>An array with the direction constants:    </p><ul><li><code>TOP</code></li><li><code>TOP_RIGHT</code></li><li><code>RIGHT</code></li><li><code>BOTTOM_RIGHT</code></li><li><code>BOTTOM</code></li><li><code>BOTTOM_LEFT</code></li><li><code>LEFT</code></li><li><code>TOP_LEFT</code></li></ul><p></p></td></tr></tbody></table>
+---@field setDirections fun(directions:any)
+local Spawning = {}
