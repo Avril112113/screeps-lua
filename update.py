@@ -120,6 +120,9 @@ def create_project(srcpath: str):
 		shutil.copy(f"{SCREEPS_LUA_PATH}build/main.js", "./build")
 	else:
 		print(f"Skipped copying build as it exists. Please delete this directory and re-run if it's not within a release download or screeps-lua source.", file=sys.stderr)
+	if os.path.isdir("typing"):
+		shutil.rmtree("typing")
+	shutil.copytree(f"{SCREEPS_LUA_PATH}typing", "typing")
 
 
 if __name__ == "__main__":
