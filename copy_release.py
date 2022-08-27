@@ -16,6 +16,7 @@ release_files = [
 	"servers.json",
 	"src_starter",
 	".vscode_starter",
+	"typing",
 	"build/main.js",
 	"build/lua_wasm.wasm",
 	"build/lua_module.js",
