@@ -23,14 +23,14 @@
 ---@field isPublic boolean
 --- <p>The amount of game ticks when this rampart will lose some hit points.</p>
 ---@field ticksToDecay number
---- <p>Destroy this structure immediately.</p>
----@field destroy fun()
---- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
----@field isActive fun()
---- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>boolean</td><td><p>Whether to enable notification or disable.</p></td></tr></tbody></table>
----@field notifyWhenAttacked fun(enabled:any)
---- <p>Make this rampart public to allow other players' creeps to pass through.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>isPublic</code></td><td>boolean</td><td><p>Whether this rampart should be public or non-public.</p></td></tr></tbody></table>
----@field setPublic fun(isPublic:any)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructureRampart.destroy"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">destroy</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Destroy this structure immediately.</p>
+---@field destroy fun(self:StructureRampart)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructureRampart.isActive"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">isActive</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--2" title="This method has medium CPU cost."></div></h2> <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
+---@field isActive fun(self:StructureRampart)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructureRampart.notifyWhenAttacked"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">notifyWhenAttacked</span><span class="api-property__args">(enabled)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
+---@field notifyWhenAttacked fun(self:StructureRampart,enabled:boolean)
+--- <h2 class="api-property api-property--method" id="StructureRampart.setPublic"><span class="api-property__name">setPublic</span><span class="api-property__args">(isPublic)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Make this rampart public to allow other players' creeps to pass through.</p>
+---@field setPublic fun(self:StructureRampart,isPublic:boolean)
 ---@field owner StructureRampart.owner
 local StructureRampart = {}
 

@@ -1,6 +1,6 @@
 import re
 import json
-from bs4.element import PageElement
+from bs4 import Tag
 from dataclasses import dataclass
 
 from utils import sections_by_tag, tags_to_desc, desc_to_comment, find_tags, return_type_code_to_json
@@ -9,22 +9,8 @@ from utils import sections_by_tag, tags_to_desc, desc_to_comment, find_tags, ret
 TYPE_JS_TO_LUA = {
 	"object": "table",
 	"array": "any[]",
+	"null": "nil"
 }
-
-
-def to_lua_type(type_: str, opts: list[str] = None):
-	parts = type_.split("|")
-	new_parts = []
-	for part in parts:
-		if opts is not None and len(opts) > 0:
-			if part == "object":
-				return f"table<{','.join(to_lua_type(opt) for opt in opts)}>"
-			elif part == "object":
-				return f"{opts[0]}[]"
-			else:
-				raise ValueError(f"opts supplied but type \"{part}\" doesn't support opts.")
-		new_parts.append(TYPE_JS_TO_LUA.get(part, part))
-	return "|".join(new_parts)
 
 
 def parse_js_type(type_: str):
@@ -33,6 +19,23 @@ def parse_js_type(type_: str):
 		return parts[0], parts[1].split(",")
 	else:
 		return parts[0], []
+
+
+def to_lua_type(type_: str):
+	parts = re.split(r"\||,(?![\w\s]+>)", type_)
+	new_parts = []
+	for part in parts:
+		part = part.split("(")[0].strip()
+		if "<" in part:
+			type_, type_opts = parse_js_type(part)
+			type_args = ",".join([to_lua_type(opt) for opt in type_opts])
+			if type_ == "array":
+				new_parts.append(f"({type_args})[]")
+			else:
+				new_parts.append(f"{TYPE_JS_TO_LUA.get(type_, type_)}<{type_args}>")
+		else:
+			new_parts.append(TYPE_JS_TO_LUA.get(part, part))
+	return "|".join(new_parts)
 
 
 PY_TO_LUA_TYPE = {
@@ -97,36 +100,61 @@ class JSMethod:
 	@dataclass()
 	class JSArg:
 		name: str
-		# type: str
-		# type_opts: list[str]
 		optional: bool = False
+
+	@dataclass()
+	class ArgInfo:
+		name: str
+		type: str
+		desc: str
 
 	description: str
 	overloads: list[list[JSArg]]
 	returns: list[str]
+	args_info: dict[str, ArgInfo]
+
+	# Tag index to start and end at
+	tag_start: int
+	tag_end: int
 
 	def __init__(self, name: str):
 		self.name = name
 
-	def parse_tags(self, tags: list[PageElement]):
-		desc_end = len(tags)
+	def parse_return_tags(self, tags: list[Tag]):
 		self.returns = []
-		for i in range(len(tags)-1, 0, -1):
+		for i in range(self.tag_end, self.tag_start, -1):
 			if tags[i].text == "Return value":
-				desc_end = i
+				self.tag_end = i
 				for tag in find_tags("pre", tags, start=i):
 					json_str = return_type_code_to_json(tag.text)
 					try:
 						self.returns.append(json_to_type(json.loads(json_str)))
 					except json.decoder.JSONDecodeError:
 						pass
-						# print("Failed to parse as json")
-						# print("- RAW -")
-						# print(tag.text)
-						# print("- CLEANED -")
-						# print(json_str)
+				# print("Failed to parse as json")
+				# print("- RAW -")
+				# print(tag.text)
+				# print("- CLEANED -")
+				# print(json_str)
 				break
-		self.description = tags_to_desc(tags[1:desc_end])
+
+	def parse_arg_info_tags(self, tags: list[Tag]):
+		self.args_info = {}
+		for i in range(self.tag_end, self.tag_start, -1):
+			if tags[i].name == "table" and len(tags[i].find(name="thead").find_all(lambda _tag: _tag.name == "th" and _tag.text in ("parameter", "type", "description"))) == 3:
+				self.tag_end = i
+				body = tags[i].find(name="tbody")
+				for tr in body.find_all(name="tr"):
+					arg_info = [tag.text for tag in tr.find_all(recursive=False)]
+					self.args_info[arg_info[0]] = JSMethod.ArgInfo(*arg_info)
+				break
+
+	def parse_tags(self, tags: list[Tag]):
+		self.tag_start = 0
+		self.tag_end = len(tags) - 1
+		self.parse_return_tags(tags)
+		self.parse_arg_info_tags(tags)
+		self.description = tags_to_desc(tags[self.tag_start:self.tag_end])
 		self.overloads = []
 		overloads = filter(lambda x: x, tags[0].find(class_="api-property__args").text.split("("))
 		for overload in overloads:
@@ -142,29 +170,30 @@ class JSMethod:
 				args.append(JSMethod.JSArg(name, optional=optional))
 			self.overloads.append(args)
 
-	def generate_args_str(self, overload: list[JSArg]):
-		return ",".join(f"{arg.name}:any{'?' if arg.optional else ''}" for arg in overload)
+	def generate_arg_type(self, arg: JSArg):
+		if arg.name in self.args_info:
+			return to_lua_type(self.args_info[arg.name].type)
+		return "any"
 
-	def generate_comment(self):
+	def generate_args_str(self, self_type: str, overload: list[JSArg]):
+		return f"self:{self_type}{',' if len(overload) > 0 else ''}" + ",".join(f"{arg.name}:{self.generate_arg_type(arg)}{'?' if arg.optional else ''}" for arg in overload)
+
+	def generate_comment(self, self_type: str):
 		# TODO: function type
 		return "\n".join([
 			desc_to_comment(self.description),
-			f"---@field {self.name} {'|'.join([f'fun({self.generate_args_str(overload)})' + (':('+'|'.join(self.returns)+')' if len(self.returns) > 0 else '') for overload in self.overloads])}",
+			f"---@field {self.name} {'|'.join([f'fun({self.generate_args_str(self_type, overload)})' + (':('+'|'.join(self.returns)+')' if len(self.returns) > 0 else '') for overload in self.overloads])}",
 		])
 
 
 class JSField:
-	type: str
-	type_opts: list[str]  # [elem_type] [key_type, value_type]
 	description: str
 
-	def __init__(self, name: str):
+	def __init__(self, name: str, type_: str):
 		self.name = name
+		self.type = type_
 
-	def parse_type_str(self, type_: str):
-		self.type, self.type_opts = parse_js_type(type_)
-
-	def parse_tags(self, tags: list[PageElement]):
+	def parse_tags(self, tags: list[Tag]):
 		# See `Structure.effects`
 		# TODO: If this type is array or object without type opts, check description for type
 		#       It can contain `an array of objects with the following properties` followed by a table for example
@@ -173,7 +202,7 @@ class JSField:
 	def generate_comment(self):
 		return "\n".join([
 			desc_to_comment(self.description),
-			f"---@field {self.name} {to_lua_type(self.type, self.type_opts)}",
+			f"---@field {self.name} {to_lua_type(self.type)}",
 		])
 
 
@@ -189,7 +218,7 @@ class JSClass:
 	def __repr__(self):
 		return f"<JSClass \"{self.name}\" classes={len(self.classes)} methods={len(self.methods)} fields={len(self.fields)}>"
 
-	def parse_tags(self, tags: list[PageElement]):
+	def parse_tags(self, tags: list[Tag]):
 		print("- Parsing", self.name)
 		things = sections_by_tag("h2", tags)
 		self.description = tags_to_desc(things[0][1:])
@@ -198,6 +227,7 @@ class JSClass:
 			path = re.sub(rf"(\w+\.)?{self.name}\.?", "", raw_path).split(".")
 			jsclass = self
 			for part in path[:-1]:
+				# noinspection PyUnresolvedReferences
 				jsclass = jsclass.classes[part]
 			name = path[-1]
 			# TODO: Check for `api-property__inherited` and instead add inherited class instead of adding to this class IN <h2>
@@ -218,21 +248,20 @@ class JSClass:
 			elif what == "method":
 				self.parse_method(jsclass, name, thing)
 
-	def parse_constructor(self, jsclass: "JSClass", name: str, tags: list[PageElement]):
+	def parse_constructor(self, jsclass: "JSClass", name: str, tags: list[Tag]):
 		pass
 
-	def parse_property(self, jsclass: "JSClass", name: str, type_: str, tags: list[PageElement]):
-		field = JSField(name)
+	def parse_property(self, jsclass: "JSClass", name: str, type_: str, tags: list[Tag]):
+		field = JSField(name, type_)
 		self.fields[name] = field
-		field.parse_type_str(type_)
 		field.parse_tags(tags)
 
-	def parse_property_object(self, jsclass: "JSClass", name: str, tags: list[PageElement]):
+	def parse_property_object(self, jsclass: "JSClass", name: str, tags: list[Tag]):
 		propclass = JSClass(name)
 		jsclass.classes[name] = propclass
 		propclass.description = tags_to_desc(tags[1:])
 
-	def parse_method(self, jsclass: "JSClass", name: str, tags: list[PageElement]):
+	def parse_method(self, jsclass: "JSClass", name: str, tags: list[Tag]):
 		method = JSMethod(name)
 		jsclass.methods[name] = method
 		method.parse_tags(tags)
@@ -243,7 +272,7 @@ class JSClass:
 			desc_to_comment(self.description),
 			f"---@class {abs_name}",
 			*[field.generate_comment() for field in self.fields.values()],
-			*[field.generate_comment() for field in self.methods.values()],
+			*[field.generate_comment(abs_name) for field in self.methods.values()],
 			*[field.generate_comment(path=abs_name) for field in self.classes.values()],
 			f"local {self.name} = {{}}",
 			"",

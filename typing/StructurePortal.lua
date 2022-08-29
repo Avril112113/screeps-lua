@@ -21,10 +21,10 @@
 ---@field destination RoomPosition|table
 --- <p>The amount of game ticks when the portal disappears, or undefined when the portal is stable.</p>
 ---@field ticksToDecay number
---- <p>Destroy this structure immediately.</p>
----@field destroy fun()
---- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
----@field isActive fun()
---- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>boolean</td><td><p>Whether to enable notification or disable.</p></td></tr></tbody></table>
----@field notifyWhenAttacked fun(enabled:any)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructurePortal.destroy"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">destroy</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Destroy this structure immediately.</p>
+---@field destroy fun(self:StructurePortal)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructurePortal.isActive"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">isActive</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--2" title="This method has medium CPU cost."></div></h2> <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
+---@field isActive fun(self:StructurePortal)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructurePortal.notifyWhenAttacked"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">notifyWhenAttacked</span><span class="api-property__args">(enabled)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
+---@field notifyWhenAttacked fun(self:StructurePortal,enabled:boolean)
 local StructurePortal = {}

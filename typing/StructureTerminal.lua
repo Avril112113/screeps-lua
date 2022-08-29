@@ -25,14 +25,14 @@
 ---@field store Store
 --- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#Store.getCapacity"><code>.store.getCapacity()</code></a>.</p>
 ---@field storeCapacity number
---- <p>Destroy this structure immediately.</p>
----@field destroy fun()
---- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
----@field isActive fun()
---- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>boolean</td><td><p>Whether to enable notification or disable.</p></td></tr></tbody></table>
----@field notifyWhenAttacked fun(enabled:any)
---- <p>Sends resource to a Terminal in another room with the specified name.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>resourceType</code></td><td>string</td><td><p>One of the <code>RESOURCE_*</code> constants.</p></td></tr><tr><td><code>amount</code></td><td>number</td><td><p>The amount of resources to be sent.</p></td></tr><tr><td><code>destination</code></td><td>string</td><td><p>The name of the target room. You don't have to gain visibility in this room.</p></td></tr><tr><td><code>description</code><br/><em>optional</em></td><td>string</td><td><p>The description of the transaction. It is visible to the recipient. The maximum length is 100 characters.</p></td></tr></tbody></table>
----@field send fun(resourceType:any,amount:any,destination:any,description:any?)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructureTerminal.destroy"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">destroy</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Destroy this structure immediately.</p>
+---@field destroy fun(self:StructureTerminal)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructureTerminal.isActive"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">isActive</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--2" title="This method has medium CPU cost."></div></h2> <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
+---@field isActive fun(self:StructureTerminal)
+--- <h2 class="api-property api-property--method api-property--inherited" id="StructureTerminal.notifyWhenAttacked"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">notifyWhenAttacked</span><span class="api-property__args">(enabled)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
+---@field notifyWhenAttacked fun(self:StructureTerminal,enabled:boolean)
+--- <h2 class="api-property api-property--method" id="StructureTerminal.send"><span class="api-property__name">send</span><span class="api-property__args">(resourceType, amount, destination, [description])</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Sends resource to a Terminal in another room with the specified name.</p>
+---@field send fun(self:StructureTerminal,resourceType:string,amount:number,destination:string,description:any?)
 ---@field owner StructureTerminal.owner
 local StructureTerminal = {}
 

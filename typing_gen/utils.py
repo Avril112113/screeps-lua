@@ -1,9 +1,9 @@
 import re
 
-from bs4.element import PageElement
+from bs4 import Tag
 
 
-def sections_by_tag(tag_name: str, tags: list[PageElement]):
+def sections_by_tag(tag_name: str, tags: list[Tag]):
 	"""Split a list of page elements (tags) into sections, with each `tag_name` defining a new section."""
 	output = []
 	i = 0
@@ -22,7 +22,7 @@ def sections_by_tag(tag_name: str, tags: list[PageElement]):
 	return output
 
 
-def tags_to_desc(tags: list[PageElement]):
+def tags_to_desc(tags: list[Tag]):
 	return " ".join(str(tag).replace("\n", "") for tag in tags if tag.name != "pre")
 
 
@@ -30,7 +30,7 @@ def desc_to_comment(desc: str):
 	return "--- " + "\n--- ".join(desc.split("\n"))
 
 
-def find_tags(name: str, tags: list[PageElement], start: int = 0):
+def find_tags(name: str, tags: list[Tag], start: int = 0):
 	results = []
 	for i in range(start, len(tags)):
 		if tags[i].name == name:

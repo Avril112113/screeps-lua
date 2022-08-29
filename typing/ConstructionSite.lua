@@ -19,8 +19,8 @@
 ---@field progressTotal number
 --- <p>One of the <code>STRUCTURE_*</code> constants.</p>
 ---@field structureType string
---- <p>Remove the construction site.</p>
----@field remove fun()
+--- <h2 class="api-property api-property--method" id="ConstructionSite.remove"><span class="api-property__name">remove</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Remove the construction site.</p>
+---@field remove fun(self:ConstructionSite)
 ---@field owner ConstructionSite.owner
 local ConstructionSite = {}
 

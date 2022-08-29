@@ -17,10 +17,10 @@
 ---@field name string
 --- <p>Flag secondary color. One of the <code>COLOR_*</code> constants.</p>
 ---@field secondaryColor number
---- <p>Remove the flag.</p>
----@field remove fun()
---- <p>Set new color of the flag.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>color</code></td><td>string</td><td><p>Primary color of the flag. One of the <code>COLOR_*</code> constants.</p></td></tr><tr><td><code>secondaryColor</code><br/><em>optional</em></td><td>string</td><td><p>Secondary color of the flag. One of the <code>COLOR_*</code> constants.</p></td></tr></tbody></table>
----@field setColor fun(color:any,secondaryColor:any?)
---- <p>Set new position of the flag.</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>x</code></td><td>number</td><td><p>The X position in the room.</p></td></tr><tr><td><code>y</code></td><td>number</td><td><p>The Y position in the room.</p></td></tr><tr><td><code>pos</code></td><td>object</td><td><p>Can be a <a href="https://docs.screeps.com/api/#RoomPosition">RoomPosition</a> object or any object containing <a href="https://docs.screeps.com/api/#RoomPosition">RoomPosition</a>.</p></td></tr></tbody></table>
----@field setPosition fun(x:any,y:any)|fun(pos:any)
+--- <h2 class="api-property api-property--method" id="Flag.remove"><span class="api-property__name">remove</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Remove the flag.</p>
+---@field remove fun(self:Flag)
+--- <h2 class="api-property api-property--method" id="Flag.setColor"><span class="api-property__name">setColor</span><span class="api-property__args">(color, [secondaryColor])</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Set new color of the flag.</p>
+---@field setColor fun(self:Flag,color:string,secondaryColor:any?)
+--- <h2 class="api-property api-property--method" id="Flag.setPosition"><span class="api-property__name">setPosition</span><span class="api-property__args">(x,y)<br/>(pos)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Set new position of the flag.</p>
+---@field setPosition fun(self:Flag,x:number,y:number)|fun(self:Flag,pos:table)
 local Flag = {}
