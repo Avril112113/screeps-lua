@@ -6,11 +6,19 @@
 			"command": "screeps-lua",
 			"type": "shell",
 			"args": [
-				"-u", "--js"
+				"--js", "-u", "${input:upload_server}"
 			],
 			"group": {
 				"kind": "build"
 			}
+		}
+	],
+	"inputs": [
+		{
+			"id": "upload_server",
+			"description": "Server to upload to",
+			"default": "localhost",
+			"type": "promptString"
 		}
 	]
 }
