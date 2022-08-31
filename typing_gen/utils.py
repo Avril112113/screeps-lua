@@ -44,3 +44,18 @@ JS_KEY_TO_JSON_RE = re.compile(r"(\w+):")
 JS_VALUE_CONST_TO_JSON_RE = re.compile(r"(?<=: )([A-Z_]+)")
 def return_type_code_to_json(text: str):
 	return JS_VALUE_CONST_TO_JSON_RE.sub("\"\\1\"", JS_KEY_TO_JSON_RE.sub("\"\\1\":", RETURN_TYPE_CLEAN_RE.sub("", text.replace("'", "\"").replace("undefined", "null"))))
+
+
+def parse_table(tag: Tag) -> list[dict[str, Tag]]:
+	assert tag.name == "table"
+	values = []
+	head = tag.find("thead")
+	props = [th.text for th in head.find_all("th", recursive=True)]
+	body = tag.find("tbody")
+	for tr in body.find_all("tr"):
+		tds = tr.find_all("td")
+		data = {}
+		for i in range(len(props)):
+			data[props[i]] = tds[i]
+		values.append(data)
+	return values

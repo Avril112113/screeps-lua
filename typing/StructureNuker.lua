@@ -31,13 +31,13 @@
 ---@field cooldown number
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
---- <h2 class="api-property api-property--method api-property--inherited" id="StructureNuker.destroy"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">destroy</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Destroy this structure immediately.</p>
+--- <p>Destroy this structure immediately.</p>
 ---@field destroy fun(self:StructureNuker)
---- <h2 class="api-property api-property--method api-property--inherited" id="StructureNuker.isActive"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">isActive</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--2" title="This method has medium CPU cost."></div></h2> <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
+--- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureNuker)
---- <h2 class="api-property api-property--method api-property--inherited" id="StructureNuker.notifyWhenAttacked"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">notifyWhenAttacked</span><span class="api-property__args">(enabled)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
+--- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
 ---@field notifyWhenAttacked fun(self:StructureNuker,enabled:boolean)
---- <h2 class="api-property api-property--method" id="StructureNuker.launchNuke"><span class="api-property__name">launchNuke</span><span class="api-property__args">(pos)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Launch a nuke to the specified position.</p>
+--- <p>Launch a nuke to the specified position.</p>
 ---@field launchNuke fun(self:StructureNuker,pos:RoomPosition)
 ---@field owner StructureNuker.owner
 local StructureNuker = {}

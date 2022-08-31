@@ -3,7 +3,16 @@ import json
 from bs4 import Tag
 from dataclasses import dataclass
 
-from utils import sections_by_tag, tags_to_desc, desc_to_comment, find_tags, return_type_code_to_json
+from utils import sections_by_tag, tags_to_desc, desc_to_comment, parse_table, return_type_code_to_json
+
+
+DESC_FIELDS_REGEX = {
+	"IS_FIELDS": re.compile(r"with the following properties"),
+}
+
+RETURN_VALUE_REGEX = {
+	"IS_CODE": re.compile(r"following (?:error)? codes"),
+}
 
 
 TYPE_JS_TO_LUA = {
@@ -123,38 +132,44 @@ class JSMethod:
 	def parse_return_tags(self, tags: list[Tag]):
 		self.returns = []
 		for i in range(self.tag_end, self.tag_start, -1):
-			if tags[i].text == "Return value":
-				self.tag_end = i
-				for tag in find_tags("pre", tags, start=i):
-					json_str = return_type_code_to_json(tag.text)
-					try:
-						self.returns.append(json_to_type(json.loads(json_str)))
-					except json.decoder.JSONDecodeError:
-						pass
-				# print("Failed to parse as json")
-				# print("- RAW -")
-				# print(tag.text)
-				# print("- CLEANED -")
-				# print(json_str)
+			if tags[i].name == "h3" and tags[i].text == "Return value":
+				for ri in range(i+1, self.tag_end+1):
+					tag = tags[ri]
+					tag_text = tag.text
+					if tag.name == "pre":
+						json_str = return_type_code_to_json(tag_text)
+						try:
+							self.returns.append(json_to_type(json.loads(json_str)))
+						except json.decoder.JSONDecodeError:
+							# print("Failed to parse as json")
+							# print("- RAW -")
+							# print(tag.text)
+							# print("- CLEANED -")
+							# print(json_str)
+							pass
+					elif RETURN_VALUE_REGEX["IS_CODE"].search(tag_text):
+						pass  # TODO
+				self.tag_end = i-1
 				break
 
 	def parse_arg_info_tags(self, tags: list[Tag]):
 		self.args_info = {}
 		for i in range(self.tag_end, self.tag_start, -1):
-			if tags[i].name == "table" and len(tags[i].find(name="thead").find_all(lambda _tag: _tag.name == "th" and _tag.text in ("parameter", "type", "description"))) == 3:
-				self.tag_end = i
-				body = tags[i].find(name="tbody")
-				for tr in body.find_all(name="tr"):
-					arg_info = [tag.text for tag in tr.find_all(recursive=False)]
-					self.args_info[arg_info[0]] = JSMethod.ArgInfo(*arg_info)
-				break
+			# noinspection PyUnboundLocalVariable
+			if tags[i].name == "table" and (table := parse_table(tags[i])) and len(table) > 0:
+				if all(k in table[0] for k in ("parameter", "type", "description")):
+					self.tag_end = i-1
+					for field in table:
+						name, type_, desc = field["parameter"].text, field["type"].text, field["description"]
+						self.args_info[name] = JSMethod.ArgInfo(name, type_, desc.text)
+					break
 
 	def parse_tags(self, tags: list[Tag]):
-		self.tag_start = 0
+		self.tag_start = 1
 		self.tag_end = len(tags) - 1
 		self.parse_return_tags(tags)
 		self.parse_arg_info_tags(tags)
-		self.description = tags_to_desc(tags[self.tag_start:self.tag_end])
+		self.description = tags_to_desc(tags[self.tag_start:self.tag_end+1])
 		self.overloads = []
 		overloads = filter(lambda x: x, tags[0].find(class_="api-property__args").text.split("("))
 		for overload in overloads:
@@ -189,15 +204,25 @@ class JSMethod:
 class JSField:
 	description: str
 
-	def __init__(self, name: str, type_: str):
+	# Tag index to start and end at
+	tag_start: int
+	tag_end: int
+
+	def __init__(self, name: str, type_: str, jsclass: "JSClass"):
 		self.name = name
 		self.type = type_
+		self.jsclass = jsclass
+
+	def __repr__(self):
+		return f"<JSField {self.jsclass.name}.{self.name}: {self.type}>"
 
 	def parse_tags(self, tags: list[Tag]):
 		# See `Structure.effects`
-		# TODO: If this type is array or object without type opts, check description for type
+		# TODO: If this type is array without type opts, check description for type
 		#       It can contain `an array of objects with the following properties` followed by a table for example
-		self.description = tags_to_desc(tags[1:])
+		self.tag_start = 1
+		self.tag_end = len(tags) - 1
+		self.description = tags_to_desc(tags[self.tag_start:self.tag_end+1])
 
 	def generate_comment(self):
 		return "\n".join([
@@ -248,18 +273,33 @@ class JSClass:
 			elif what == "method":
 				self.parse_method(jsclass, name, thing)
 
+	def parse_property_desc(self, tags: list[Tag]):
+		tag_start, tag_end = 1, len(tags) - 1
+		for i in range(tag_start, tag_end):
+			tag = tags[i]
+			tag_text = tag.text
+			if DESC_FIELDS_REGEX["IS_FIELDS"].search(tag_text):
+				tag_end = i
+				for field in parse_table(tags[i + 1]):
+					name, type_, desc = field["parameter"].text, field["type"].text, field["description"]
+					jsfield = JSField(name, type_, self)
+					jsfield.description = " ".join([str(child) for child in desc.children]).strip()
+					self.fields[name] = jsfield
+		self.description = tags_to_desc(tags[tag_start:tag_end+1])
+
 	def parse_constructor(self, jsclass: "JSClass", name: str, tags: list[Tag]):
 		pass
 
 	def parse_property(self, jsclass: "JSClass", name: str, type_: str, tags: list[Tag]):
-		field = JSField(name, type_)
+		field = JSField(name, type_, jsclass)
 		self.fields[name] = field
 		field.parse_tags(tags)
 
 	def parse_property_object(self, jsclass: "JSClass", name: str, tags: list[Tag]):
 		propclass = JSClass(name)
 		jsclass.classes[name] = propclass
-		propclass.description = tags_to_desc(tags[1:])
+		propclass.parse_property_desc(tags)
+		# propclass.description = tags_to_desc(tags[1:])
 
 	def parse_method(self, jsclass: "JSClass", name: str, tags: list[Tag]):
 		method = JSMethod(name)

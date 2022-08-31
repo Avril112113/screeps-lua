@@ -19,13 +19,13 @@
 ---@field structureType string
 --- <p>Whether this is your own structure.</p>
 ---@field my boolean
---- <h2 class="api-property api-property--method api-property--inherited" id="StructureObserver.destroy"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">destroy</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Destroy this structure immediately.</p>
+--- <p>Destroy this structure immediately.</p>
 ---@field destroy fun(self:StructureObserver)
---- <h2 class="api-property api-property--method api-property--inherited" id="StructureObserver.isActive"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">isActive</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--2" title="This method has medium CPU cost."></div></h2> <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
+--- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureObserver)
---- <h2 class="api-property api-property--method api-property--inherited" id="StructureObserver.notifyWhenAttacked"><div class="api-property__inherited">Inherited from <a href="https://docs.screeps.com/api/#Structure">Structure</a></div><span class="api-property__name">notifyWhenAttacked</span><span class="api-property__args">(enabled)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
+--- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
 ---@field notifyWhenAttacked fun(self:StructureObserver,enabled:boolean)
---- <h2 class="api-property api-property--method" id="StructureObserver.observeRoom"><span class="api-property__name">observeRoom</span><span class="api-property__args">(roomName)</span><div class="api-property__cpu api-property__cpu--A" title="This method is an action that changes game state. It has additional 0.2 CPU cost added to its natural cost in case if OK code is returned."></div></h2> <p>Provide visibility into a distant room from your script. The target room object will be available on the next tick.</p>
+--- <p>Provide visibility into a distant room from your script. The target room object will be available on the next tick.</p>
 ---@field observeRoom fun(self:StructureObserver,roomName:string)
 ---@field owner StructureObserver.owner
 local StructureObserver = {}

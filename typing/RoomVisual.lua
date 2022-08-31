@@ -5,22 +5,22 @@
 ---@class RoomVisual
 --- <p>The name of the room.</p>
 ---@field roomName string
---- <h2 class="api-property api-property--method" id="RoomVisual.line"><span class="api-property__name">line</span><span class="api-property__args">(x1, y1, x2, y2, [style])<br/>(pos1, pos2, [style])</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Draw a line.</p>
+--- <p>Draw a line.</p>
 ---@field line fun(self:RoomVisual,x1:number,y1:number,x2:number,y2:number,style:any?)|fun(self:RoomVisual,pos1:RoomPosition,pos2:RoomPosition,style:any?)
---- <h2 class="api-property api-property--method" id="RoomVisual.circle"><span class="api-property__name">circle</span><span class="api-property__args">(x, y, [style])<br/>(pos, [style])</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Draw a circle.</p>
+--- <p>Draw a circle.</p>
 ---@field circle fun(self:RoomVisual,x:number,y:number,style:any?)|fun(self:RoomVisual,pos:RoomPosition,style:any?)
---- <h2 class="api-property api-property--method" id="RoomVisual.rect"><span class="api-property__name">rect</span><span class="api-property__args">(x, y, width, height, [style])<br/>(topLeftPos, width, height, [style])</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Draw a rectangle.</p>
+--- <p>Draw a rectangle.</p>
 ---@field rect fun(self:RoomVisual,x:number,y:number,width:number,height:number,style:any?)|fun(self:RoomVisual,topLeftPos:RoomPosition,width:number,height:number,style:any?)
---- <h2 class="api-property api-property--method" id="RoomVisual.poly"><span class="api-property__name">poly</span><span class="api-property__args">(points, [style])</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Draw a polyline.</p>
+--- <p>Draw a polyline.</p>
 ---@field poly fun(self:RoomVisual,points:any[],style:any?)
---- <h2 class="api-property api-property--method" id="RoomVisual.text"><span class="api-property__name">text</span><span class="api-property__args">(text, x, y, [style])<br/>(text, pos, [style])</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Draw a text label. You can use any valid Unicode characters, including <a href="http://unicode.org/emoji/charts/emoji-style.txt" target="_blank">emoji</a>.</p>
+--- <p>Draw a text label. You can use any valid Unicode characters, including <a href="http://unicode.org/emoji/charts/emoji-style.txt" target="_blank">emoji</a>.</p>
 ---@field text fun(self:RoomVisual,text:string,x:number,y:number,style:any?)|fun(self:RoomVisual,text:string,pos:RoomPosition,style:any?)
---- <h2 class="api-property api-property--method" id="RoomVisual.clear"><span class="api-property__name">clear</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Remove all visuals from the room.</p>
+--- <p>Remove all visuals from the room.</p>
 ---@field clear fun(self:RoomVisual)
---- <h2 class="api-property api-property--method" id="RoomVisual.getSize"><span class="api-property__name">getSize</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Get the stored size of all visuals added in the room in the current tick. It must not exceed 512,000 (500 KB).</p>
+--- <p>Get the stored size of all visuals added in the room in the current tick. It must not exceed 512,000 (500 KB).</p>
 ---@field getSize fun(self:RoomVisual)
---- <h2 class="api-property api-property--method" id="RoomVisual.export"><span class="api-property__name">export</span><span class="api-property__args">()</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Returns a compact representation of all visuals added in the room in the current tick.</p>
+--- <p>Returns a compact representation of all visuals added in the room in the current tick.</p>
 ---@field export fun(self:RoomVisual)
---- <h2 class="api-property api-property--method" id="RoomVisual.import"><span class="api-property__name">import</span><span class="api-property__args">(val)</span><div class="api-property__cpu api-property__cpu--0" title="This method has insignificant CPU cost."></div></h2> <p>Add previously exported (with <a href="https://docs.screeps.com/api/#RoomVisual.export">RoomVisual.export</a>) room visuals to the room visual data of the current tick. </p>
+--- <p>Add previously exported (with <a href="https://docs.screeps.com/api/#RoomVisual.export">RoomVisual.export</a>) room visuals to the room visual data of the current tick. </p>
 ---@field import fun(self:RoomVisual,val:string)
 local RoomVisual = {}
