@@ -15,7 +15,8 @@ Quick usage examples:
 Running `screeps-lua` will update the Lua `./src`.  
 The following arguments may be used:  
 - `--create` (Default: `False`)  
-  Creates a new project in the current directory.  
+  Creates a new or updates an existing project in the current directory.  
+  Note, `./build` and `./typing` should be deleted before running to update.  
 - `--src <path>` (Default: `./src`)  
   This will change the directory of the Lua source code to be updated.  
 - `-u [server]` `--upload [server]` (Default: `localhost`)  
