@@ -39,11 +39,24 @@ def find_tags(name: str, tags: list[Tag], start: int = 0):
 
 
 # Shh, this is the most hacky thing ever...
-RETURN_TYPE_CLEAN_RE = re.compile(r"//.*?\n|(?:,\s*(?!\.\.\.\s*[{\[]))?\.\.\.|/\*.*/\*")
-JS_KEY_TO_JSON_RE = re.compile(r"(\w+):")
+# It got worse so, just, keep eyes away...
+RETURN_TYPE_CLEAN_RE = re.compile(r"//.*?\n|/\*.*/\*|(?:,\s*(?!\.\.\.\s*[{\[]))?\.\.\.|,(?=[\s\n\r]*[}\]])")
+JS_KEY_TO_JSON_RE = re.compile(r"((?:\w+)|(?:\[[\w.]+]))\s*:")
 JS_VALUE_CONST_TO_JSON_RE = re.compile(r"(?<=: )([A-Z_]+)")
-def return_type_code_to_json(text: str):
-	return JS_VALUE_CONST_TO_JSON_RE.sub("\"\\1\"", JS_KEY_TO_JSON_RE.sub("\"\\1\":", RETURN_TYPE_CLEAN_RE.sub("", text.replace("'", "\"").replace("undefined", "null"))))
+JS_EXPORT_TO_STR = re.compile(r"(?<!\[)(exports\.[\w.]+)")
+JS_DECIMAL_TO_STR = re.compile(r"(?<!0)(\.\d+)")
+JS_MATH_EVAL = re.compile(r"(\d+[+*\-/\s]+[\d+*\-/\s]+)")
+JS_MATH_LEAD_ZERO = re.compile(r"0+(\d+)")
+def js_type_code_to_json(text: str):
+	text = text.replace("'", "\"").replace("undefined", "null")
+	text = RETURN_TYPE_CLEAN_RE.sub("", text)
+	text = JS_KEY_TO_JSON_RE.sub("\"\\1\":", text)
+	text = JS_VALUE_CONST_TO_JSON_RE.sub("\"\\1\"", text)
+	text = JS_DECIMAL_TO_STR.sub("0\\1", text)
+	text = JS_MATH_LEAD_ZERO.sub("\\1", text)
+	text = JS_MATH_EVAL.sub(lambda m: str(eval(m.group().strip())), text)  # Yes, `eval` is evil, but it's "fine".
+	text = JS_EXPORT_TO_STR.sub("\"\\1\"", text)
+	return text
 
 
 def parse_table(tag: Tag) -> list[dict[str, Tag]]:

@@ -10,9 +10,9 @@
 --- <p>Y position in the room.</p>
 ---@field y number
 --- <p>Create new <a href="https://docs.screeps.com/api/#ConstructionSite">ConstructionSite</a> at the specified location.</p>
----@field createConstructionSite fun(self:RoomPosition,structureType:string,name:any?)
+---@field createConstructionSite fun(self:RoomPosition,structureType:string,name:any?):(OK|ERR_INVALID_TARGET|ERR_FULL|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)
 --- <p>Create new <a href="https://docs.screeps.com/api/#Flag">Flag</a> at the specified location.</p>
----@field createFlag fun(self:RoomPosition,name:any?,color:any?,secondaryColor:any?)
+---@field createFlag fun(self:RoomPosition,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_INVALID_ARGS)
 --- <p>Find an object with the shortest path from the given position. Uses <a href="http://en.wikipedia.org/wiki/Jump_point_search" target="_blank">Jump Point Search algorithm</a> and <a href="http://en.wikipedia.org/wiki/Dijkstra" rel="noopener" target="_blank">Dijkstra's algorithm</a>.</p>
 ---@field findClosestByPath fun(self:RoomPosition,type:number,opts:any?)|fun(self:RoomPosition,objects:any[],opts:any?)
 --- <p>Find an object with the shortest linear distance from the given position.</p>

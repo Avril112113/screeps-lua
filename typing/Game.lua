@@ -54,9 +54,9 @@ local Game = {}
 --- <p><em>This method is only available when <strong>Virtual machine</strong> is set to <strong>Isolated</strong> in your <a href="https://screeps.com/a/#!/account/runtime" rel="noopener" target="_blank">account runtime settings</a>.</em></p> <p>Reset your runtime environment and wipe all data in heap memory.</p>
 ---@field halt fun(self:Game.cpu)
 --- <p>Allocate CPU limits to different shards. Total amount of CPU should remain equal to  <a href="https://docs.screeps.com/api/#Game.cpu"><code>Game.cpu.shardLimits</code></a>. This method can be used only once per 12 hours.</p>
----@field setShardLimits fun(self:Game.cpu,limits:table<string,number>)
+---@field setShardLimits fun(self:Game.cpu,limits:table<string,number>):(OK|ERR_BUSY|ERR_INVALID_ARGS)
 --- <p>Unlock full CPU for your account for additional 24 hours. This method will consume 1 CPU unlock bound to your account (See <a href="https://docs.screeps.com/api/#Game.resources"><code>Game.resources</code></a>).If full CPU is not currently unlocked for your account, it may take some time (up to 5 minutes) before unlock is applied to your account.</p>
----@field unlock fun(self:Game.cpu)
+---@field unlock fun(self:Game.cpu):(OK|ERR_NOT_ENOUGH_RESOURCES|ERR_FULL)
 --- <p>Generate 1 pixel resource unit for 10000 CPU from your bucket.</p> <table class="api-return-codes"><thead><tr><th>constant</th><th>value</th><th>description</th></tr></thead><tbody><tr><td><code>OK</code></td><td>0</td><td><p>The operation has been scheduled successfully.</p></td></tr><tr><td><code>ERR_NOT_ENOUGH_RESOURCES</code></td><td>-6</td><td><p>Your bucket does not have enough CPU.</p></td></tr></tbody></table>
 ---@field generatePixel fun(self:Game.cpu)
 local cpu = {}
@@ -86,9 +86,9 @@ local gpl = {}
 --- <p>List all exits available from the room with the given name.</p>
 ---@field describeExits fun(self:Game.map,roomName:string):(table<integer,string>)
 --- <p>Find the exit direction from the given room en route to another room.</p>
----@field findExit fun(self:Game.map,fromRoom:string|Room,toRoom:string|Room,opts:any?)
+---@field findExit fun(self:Game.map,fromRoom:string|Room,toRoom:string|Room,opts:any?):(ERR_NO_PATH|ERR_INVALID_ARGS)
 --- <p>Find route from the given room to another room.</p>
----@field findRoute fun(self:Game.map,fromRoom:string|Room,toRoom:string|Room,opts:any?):({exit:string,room:string}[])
+---@field findRoute fun(self:Game.map,fromRoom:string|Room,toRoom:string|Room,opts:any?):({exit:string,room:string}[]|ERR_NO_PATH)
 --- <p>Get the linear distance (in rooms) between two rooms. You can use this function to estimate the energy cost of sending resources through terminals, or using observers and nukes.</p>
 ---@field getRoomLinearDistance fun(self:Game.map,roomName1:string,roomName2:string,continuous:any?)
 --- <p>Get a <a href="https://docs.screeps.com/api/#Room-Terrain"><code>Room.Terrain</code></a> object which provides fast access to static terrain data. This method works for any room in the world even if you have no access to it.</p>
@@ -137,15 +137,15 @@ local visual = {}
 --- <p>Estimate the energy transaction cost of <a href="https://docs.screeps.com/api/#StructureTerminal.send"><code>StructureTerminal.send</code></a> and <a href="https://docs.screeps.com/api/#Game.market.deal"><code>Game.market.deal</code></a> methods. The formula:</p>
 ---@field calcTransactionCost fun(self:Game.market,amount:number,roomName1:string,roomName2:string)
 --- <p>Cancel a previously created order. The 5% fee is not returned.</p>
----@field cancelOrder fun(self:Game.market,orderId:string)
+---@field cancelOrder fun(self:Game.market,orderId:string):(OK|ERR_INVALID_ARGS)
 --- <p>Change the price of an existing order. If <code>newPrice</code> is greater than old price, you will be charged <code>(newPrice-oldPrice)*remainingAmount*0.05</code> credits.</p>
----@field changeOrderPrice fun(self:Game.market,orderId:string,newPrice:number)
+---@field changeOrderPrice fun(self:Game.market,orderId:string,newPrice:number):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_ARGS)
 --- <p>Create a market order in your terminal. You will be charged <code>price*amount*0.05</code> credits when the order is placed. The maximum orders count is 300 per player. You can create an order at any time with any amount, it will be automatically activated and deactivated depending on the resource/credits availability.</p>
----@field createOrder fun(self:Game.market,params:table)
+---@field createOrder fun(self:Game.market,params:table):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_FULL|ERR_INVALID_ARGS)
 --- <p>Execute a trade deal from your Terminal in <code>yourRoomName</code> to another player's Terminal using the specified buy/sell order. Your Terminal will be charged energy units of transfer cost regardless of the order resource type. You can use <a href="https://docs.screeps.com/api/#calcTransactionCost"><code>Game.market.calcTransactionCost</code></a> method to estimate it. When multiple players try to execute the same deal, the one with the shortest distance takes precedence. You cannot execute more than 10 deals during one tick.</p>
----@field deal fun(self:Game.market,orderId:string,amount:number,yourRoomName:any?)
+---@field deal fun(self:Game.market,orderId:string,amount:number,yourRoomName:any?):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_FULL|ERR_INVALID_ARGS|ERR_TIRED)
 --- <p>Add more capacity to an existing order. It will affect <code>remainingAmount</code> and <code>totalAmount</code> properties. You will be charged <code>price*addAmount*0.05</code> credits.</p>
----@field extendOrder fun(self:Game.market,orderId:string,addAmount:number)
+---@field extendOrder fun(self:Game.market,orderId:string,addAmount:number):(OK|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_ARGS)
 --- <p>Get other players' orders currently active on the market. This method supports internal indexing by <code>resourceType</code>.</p>
 ---@field getAllOrders fun(self:Game.market,filter:any?)
 --- <p>Get daily price history of the specified resource on the market for the last 14 days. </p>

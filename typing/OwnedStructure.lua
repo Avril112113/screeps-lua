@@ -20,11 +20,11 @@
 --- <p>Whether this is your own structure.</p>
 ---@field my boolean
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:OwnedStructure)
+---@field destroy fun(self:OwnedStructure):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:OwnedStructure)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:OwnedStructure,enabled:boolean)
+---@field notifyWhenAttacked fun(self:OwnedStructure,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 ---@field owner OwnedStructure.owner
 local OwnedStructure = {}
 

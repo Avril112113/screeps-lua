@@ -40,43 +40,43 @@
 --- <p>The remaining amount of game ticks after which the creep will die and become unspawned. Undefined if the creepis not spawned in the world. </p>
 ---@field ticksToLive number
 --- <p>A static method to create new Power Creep instance in your account. It will be added in an unspawned state, use <a href="https://docs.screeps.com/api/#PowerCreep.spawn"><code>spawn</code></a> method to spawn it in the world.</p> <p>You need one free Power Level in your account to perform this action.</p>
----@field create fun(self:PowerCreep,name:string,className:string)
+---@field create fun(self:PowerCreep,name:string,className:string):(OK|ERR_NAME_EXISTS|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_ARGS)
 --- <p>Cancel the order given during the current game tick.</p>
----@field cancelOrder fun(self:PowerCreep,methodName:string)
+---@field cancelOrder fun(self:PowerCreep,methodName:string):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_FOUND)
 --- <p>Delete the power creep permanently from your account. It should NOT be spawned in the world. The creep is not deletedimmediately, but a 24-hours delete timer is started instead (see <a href="https://docs.screeps.com/api/#PowerCreep.deleteTime"><code>deleteTime</code></a>). You can cancel deletion by calling <code>delete(true)</code>.</p>
----@field delete fun(self:PowerCreep,cancel:boolean?)
+---@field delete fun(self:PowerCreep,cancel:boolean?):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Drop this resource on the ground.</p>
----@field drop fun(self:PowerCreep,resourceType:string,amount:any?)
+---@field drop fun(self:PowerCreep,resourceType:string,amount:any?):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_ARGS)
 --- <p>Enable powers usage in this room. The room controller should be at adjacent tile.</p>
----@field enableRoom fun(self:PowerCreep,controller:StructureController)
+---@field enableRoom fun(self:PowerCreep,controller:StructureController):(OK|ERR_NOT_OWNER|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE)
 --- <p>Move the creep one square in the specified direction.  </p>
----@field move fun(self:PowerCreep,direction:Creep|number)
+---@field move fun(self:PowerCreep,direction:Creep|number):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS|ERR_TIRED)
 --- <p>Move the creep using the specified predefined path. </p>
----@field moveByPath fun(self:PowerCreep,path:any[]|string)
+---@field moveByPath fun(self:PowerCreep,path:any[]|string):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_FOUND|ERR_INVALID_ARGS|ERR_TIRED)
 --- <p>Find the optimal path to the target within the same room and move to it. A shorthand to consequent calls of <a href="https://docs.screeps.com/api/#RoomPosition.findPathTo">pos.findPathTo()</a> and <a href="https://docs.screeps.com/api/#Creep.move">move()</a> methods. If the target is in another room, then the corresponding exit will be used as a target. </p>
----@field moveTo fun(self:PowerCreep,x:number,y:number,opts:any?)|fun(self:PowerCreep,target:table,opts:any?)
+---@field moveTo fun(self:PowerCreep,x:number,y:number,opts:any?):(OK|ERR_NOT_OWNER|ERR_NO_PATH|ERR_BUSY|ERR_NOT_FOUND|ERR_INVALID_TARGET|ERR_TIRED)|fun(self:PowerCreep,target:table,opts:any?):(OK|ERR_NOT_OWNER|ERR_NO_PATH|ERR_BUSY|ERR_NOT_FOUND|ERR_INVALID_TARGET|ERR_TIRED)
 --- <p>Toggle auto notification when the creep is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:PowerCreep,enabled:boolean)
+---@field notifyWhenAttacked fun(self:PowerCreep,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_ARGS)
 --- <p>Pick up an item (a dropped piece of energy). The target has to be at adjacent square to the creep or at the same square.</p>
----@field pickup fun(self:PowerCreep,target:Resource)
+---@field pickup fun(self:PowerCreep,target:Resource):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE)
 --- <p>Rename the power creep. It must not be spawned in the world.</p>
----@field rename fun(self:PowerCreep,name:string)
+---@field rename fun(self:PowerCreep,name:string):(OK|ERR_NOT_OWNER|ERR_NAME_EXISTS|ERR_BUSY)
 --- <p>Instantly restore time to live to the maximum using a Power Spawn or a Power Bank nearby. It has to be at adjacent tile. </p>
----@field renew fun(self:PowerCreep,target:StructurePowerBank|StructurePowerSpawn)
+---@field renew fun(self:PowerCreep,target:StructurePowerBank|StructurePowerSpawn):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE)
 --- <p>Display a visual speech balloon above the creep with the specified message. The message will be available for one tick. You can read the last message using the <code>saying</code> property. Any valid Unicode characters are allowed, including <a href="http://unicode.org/emoji/charts/emoji-style.txt" target="_blank">emoji</a>.</p>
----@field say fun(self:PowerCreep,message:string,public:any?)
+---@field say fun(self:PowerCreep,message:string,public:any?):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Spawn this power creep in the specified Power Spawn.</p>
----@field spawn fun(self:PowerCreep,powerSpawn:StructurePowerSpawn)
+---@field spawn fun(self:PowerCreep,powerSpawn:StructurePowerSpawn):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_TIRED|ERR_RCL_NOT_ENOUGH)
 --- <p>Kill the power creep immediately. It will not be destroyed permanently, but will become unspawned,so that you can <a href="https://docs.screeps.com/api/#PowerCreep.spawn"><code>spawn</code></a> it again.</p>
----@field suicide fun(self:PowerCreep)
+---@field suicide fun(self:PowerCreep):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Transfer resource from the creep to another object. The target has to be at adjacent square to the creep.</p>
----@field transfer fun(self:PowerCreep,target:Creep|Structure,resourceType:string,amount:any?)
+---@field transfer fun(self:PowerCreep,target:Creep|Structure,resourceType:string,amount:any?):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS)
 --- <p>Upgrade the creep, adding a new power ability to it or increasing level of the existing power. You need one free Power Level in your account to perform this action. </p>
----@field upgrade fun(self:PowerCreep,power:number)
+---@field upgrade fun(self:PowerCreep,power:number):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_FULL|ERR_INVALID_ARGS)
 --- <p>Apply one the creep's powers on the specified target. You can only use powers in rooms either without a controller, or with a <a href="https://docs.screeps.com/api/#PowerCreep.enableRoom">power-enabled</a> controller.Only one power can be used during the same tick, each <code>usePower</code> call will override the previous one.If the target has the same effect of a lower or equal level, it is overridden. If the existing effect level is higher, an error is returned.</p> <p><a href="https://docs.screeps.com/power.html#Powers">Full list of available powers</a> </p>
----@field usePower fun(self:PowerCreep,power:number,target:RoomObject?)
+---@field usePower fun(self:PowerCreep,power:number,target:RoomObject?):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS|ERR_TIRED|ERR_NO_BODYPART)
 --- <p>Withdraw resources from a structure or tombstone. The target has to be at adjacent square to the creep. Multiple creeps can withdraw from the same object in the same tick. Your creeps can withdraw resources from hostile structures/tombstones as well, in case if there is no hostile rampart on top of it.</p> <p>This method should not be used to transfer resources between creeps. To transfer between creeps, use the <a href="https://docs.screeps.com/api/#Creep.transfer"><code>transfer</code></a> method on the original creep.</p>
----@field withdraw fun(self:PowerCreep,target:Structure|Tombstone,resourceType:string,amount:any?)
+---@field withdraw fun(self:PowerCreep,target:Structure|Tombstone,resourceType:string,amount:any?):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS)
 ---@field carry PowerCreep.carry
 ---@field owner PowerCreep.owner
 ---@field powers PowerCreep.powers

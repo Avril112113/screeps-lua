@@ -28,13 +28,13 @@
 --- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#Store.getCapacity"><code>.store.getCapacity()</code></a>.</p>
 ---@field storeCapacity number
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructureFactory)
+---@field destroy fun(self:StructureFactory):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureFactory)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructureFactory,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructureFactory,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 --- <p>Produces the specified commodity. All ingredients should be available in the factory store.</p>
----@field produce fun(self:StructureFactory,resourceType:string)
+---@field produce fun(self:StructureFactory,resourceType:string):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_INVALID_ARGS|ERR_TIRED|ERR_RCL_NOT_ENOUGH)
 ---@field owner StructureFactory.owner
 local StructureFactory = {}
 

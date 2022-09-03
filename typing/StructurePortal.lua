@@ -22,9 +22,9 @@
 --- <p>The amount of game ticks when the portal disappears, or undefined when the portal is stable.</p>
 ---@field ticksToDecay number
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructurePortal)
+---@field destroy fun(self:StructurePortal):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructurePortal)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructurePortal,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructurePortal,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 local StructurePortal = {}

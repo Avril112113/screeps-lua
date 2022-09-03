@@ -3,15 +3,14 @@ import json
 from bs4 import Tag
 from dataclasses import dataclass
 
-from utils import sections_by_tag, tags_to_desc, desc_to_comment, parse_table, return_type_code_to_json
-
+from utils import sections_by_tag, tags_to_desc, desc_to_comment, parse_table, js_type_code_to_json
 
 DESC_FIELDS_REGEX = {
 	"IS_FIELDS": re.compile(r"with the following properties"),
 }
 
 RETURN_VALUE_REGEX = {
-	"IS_CODE": re.compile(r"following (?:error)? codes"),
+	"IS_CODE": re.compile(r"following (?:error )?codes"),
 }
 
 
@@ -137,7 +136,7 @@ class JSMethod:
 					tag = tags[ri]
 					tag_text = tag.text
 					if tag.name == "pre":
-						json_str = return_type_code_to_json(tag_text)
+						json_str = js_type_code_to_json(tag_text)
 						try:
 							self.returns.append(json_to_type(json.loads(json_str)))
 						except json.decoder.JSONDecodeError:
@@ -148,7 +147,9 @@ class JSMethod:
 							# print(json_str)
 							pass
 					elif RETURN_VALUE_REGEX["IS_CODE"].search(tag_text):
-						pass  # TODO
+						table = parse_table(tags[ri+1])
+						constants = [field["constant"].text for field in table]
+						self.returns.append("|".join(constants))
 				self.tag_end = i-1
 				break
 
@@ -322,3 +323,40 @@ class JSClass:
 	def generate_comment(self, path: str = None):
 		abs_name = f"{path + '.' if path else ''}{self.name}"
 		return f"---@field {self.name} {abs_name}"
+
+
+class JSConstants(JSClass):
+	constants: dict[str, str]
+
+	def parse_tags(self, tags: list[Tag]):
+		print("- Parsing", self.name)
+		code = tags[2].find("code").text
+		sections = code.split("Object.assign(exports,")
+		self.constants = {}
+		for section in sections:
+			section = section.strip()[:-2]  # Remove ");"
+			if len(section) <= 0:
+				continue
+			json_str = js_type_code_to_json(section)
+			try:
+				data = json.loads(json_str)
+			except json.JSONDecodeError:
+				# print("Failed to parse as json")
+				# print("- RAW -")
+				# print(section)
+				# print("- CLEANED -")
+				# print(json_str)
+				continue
+			for key, value in data.items():
+				if value is None:
+					self.constants[key] = "any"
+				else:
+					self.constants[key] = json_to_type(value).replace("exports.", "")
+
+	def generate(self, path: str = None):
+		return "\n".join([
+			# This produces a lot of classes, but in same cases it's needed for the types...
+			# It could be done better and cleaner, but this does work.
+			*[f"---@class {key} : {type_}\n{key} = nil" for key, type_ in self.constants.items()],
+			"",
+		])

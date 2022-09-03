@@ -20,13 +20,13 @@
 --- <p>Whether this is your own structure.</p>
 ---@field my boolean
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructureObserver)
+---@field destroy fun(self:StructureObserver):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureObserver)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructureObserver,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructureObserver,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 --- <p>Provide visibility into a distant room from your script. The target room object will be available on the next tick.</p>
----@field observeRoom fun(self:StructureObserver,roomName:string)
+---@field observeRoom fun(self:StructureObserver,roomName:string):(OK|ERR_NOT_OWNER|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)
 ---@field owner StructureObserver.owner
 local StructureObserver = {}
 

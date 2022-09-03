@@ -34,19 +34,19 @@
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructureLab)
+---@field destroy fun(self:StructureLab):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureLab)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructureLab,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructureLab,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 --- <p>Boosts creep body parts using the containing mineral compound. The creep has to be at adjacent square to the lab. </p>
----@field boostCreep fun(self:StructureLab,creep:Creep,bodyPartsCount:any?)
+---@field boostCreep fun(self:StructureLab,creep:Creep,bodyPartsCount:any?):(OK|ERR_NOT_OWNER|ERR_NOT_FOUND|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_RCL_NOT_ENOUGH)
 --- <p>Breaks mineral compounds back into reagents. The same output labs can be used by many source labs.</p>
----@field reverseReaction fun(self:StructureLab,lab1:StructureLab,lab2:StructureLab)
+---@field reverseReaction fun(self:StructureLab,lab1:StructureLab,lab2:StructureLab):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS|ERR_TIRED|ERR_RCL_NOT_ENOUGH)
 --- <p>Produce mineral compounds using reagents from two other labs. The same input labs can be used by many output labs.</p>
----@field runReaction fun(self:StructureLab,lab1:StructureLab,lab2:StructureLab)
+---@field runReaction fun(self:StructureLab,lab1:StructureLab,lab2:StructureLab):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS|ERR_TIRED|ERR_RCL_NOT_ENOUGH)
 --- <p>Immediately remove boosts from the creep and drop 50% of the mineral compounds used to boost it onto the ground regardless of the creep's remaining time to live. The creep has to be at adjacent square to the lab. Unboosting requires cooldown time equal to the total sum of the reactions needed to produce all the compounds applied to the creep.</p>
----@field unboostCreep fun(self:StructureLab,creep:Creep)
+---@field unboostCreep fun(self:StructureLab,creep:Creep):(OK|ERR_NOT_OWNER|ERR_NOT_FOUND|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_TIRED|ERR_RCL_NOT_ENOUGH)
 ---@field owner StructureLab.owner
 local StructureLab = {}
 

@@ -20,7 +20,7 @@
 --- <p>Remove the flag.</p>
 ---@field remove fun(self:Flag)
 --- <p>Set new color of the flag.</p>
----@field setColor fun(self:Flag,color:string,secondaryColor:any?)
+---@field setColor fun(self:Flag,color:string,secondaryColor:any?):(OK|ERR_INVALID_ARGS)
 --- <p>Set new position of the flag.</p>
----@field setPosition fun(self:Flag,x:number,y:number)|fun(self:Flag,pos:table)
+---@field setPosition fun(self:Flag,x:number,y:number):(OK|ERR_INVALID_TARGET)|fun(self:Flag,pos:table):(OK|ERR_INVALID_TARGET)
 local Flag = {}

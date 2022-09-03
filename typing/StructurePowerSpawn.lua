@@ -30,13 +30,13 @@
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructurePowerSpawn)
+---@field destroy fun(self:StructurePowerSpawn):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructurePowerSpawn)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructurePowerSpawn,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructurePowerSpawn,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 --- <p>Register power resource units into your account. Registered power allows to develop power creeps skills. </p>
----@field processPower fun(self:StructurePowerSpawn)
+---@field processPower fun(self:StructurePowerSpawn):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_RCL_NOT_ENOUGH)
 ---@field owner StructurePowerSpawn.owner
 local StructurePowerSpawn = {}
 

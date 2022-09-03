@@ -26,11 +26,11 @@
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructureExtension)
+---@field destroy fun(self:StructureExtension):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureExtension)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructureExtension,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructureExtension,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 ---@field owner StructureExtension.owner
 local StructureExtension = {}
 

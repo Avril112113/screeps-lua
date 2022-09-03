@@ -20,7 +20,7 @@
 --- <p>One of the <code>STRUCTURE_*</code> constants.</p>
 ---@field structureType string
 --- <p>Remove the construction site.</p>
----@field remove fun(self:ConstructionSite)
+---@field remove fun(self:ConstructionSite):(OK|ERR_NOT_OWNER)
 ---@field owner ConstructionSite.owner
 local ConstructionSite = {}
 

@@ -24,13 +24,13 @@
 --- <p>Deserialize a short string path representation into an array form.</p>
 ---@field deserializePath fun(self:Room,path:string)
 --- <p>Create new <a href="https://docs.screeps.com/api/#ConstructionSite">ConstructionSite</a> at the specified location.</p>
----@field createConstructionSite fun(self:Room,x:number,y:number,structureType:string,name:any?)|fun(self:Room,pos:table,structureType:string,name:any?)
+---@field createConstructionSite fun(self:Room,x:number,y:number,structureType:string,name:any?):(OK|ERR_NOT_OWNER|ERR_INVALID_TARGET|ERR_FULL|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)|fun(self:Room,pos:table,structureType:string,name:any?):(OK|ERR_NOT_OWNER|ERR_INVALID_TARGET|ERR_FULL|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)
 --- <p>Create new <a href="https://docs.screeps.com/api/#Flag">Flag</a> at the specified location.</p>
----@field createFlag fun(self:Room,x:number,y:number,name:any?,color:any?,secondaryColor:any?)|fun(self:Room,pos:table,name:any?,color:any?,secondaryColor:any?)
+---@field createFlag fun(self:Room,x:number,y:number,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_FULL|ERR_INVALID_ARGS)|fun(self:Room,pos:table,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_FULL|ERR_INVALID_ARGS)
 --- <p>Find all objects of the specified type in the room. Results are cached automatically for the specified room and type before applying any custom filters. This automatic cache lasts until the end of the tick.</p>
 ---@field find fun(self:Room,type:number,opts:any?)
 --- <p>Find the exit direction en route to another room. Please note that this method is not required for inter-room movement, you can simply pass the target in another room into <a href="https://docs.screeps.com/api/#Creep.moveTo"><code>Creep.moveTo</code></a> method.</p>
----@field findExitTo fun(self:Room,room:string|Room)
+---@field findExitTo fun(self:Room,room:string|Room):(ERR_NO_PATH|ERR_INVALID_ARGS)
 --- <p>Find an optimal path inside the room between fromPos and toPos using <a href="http://en.wikipedia.org/wiki/Jump_point_search" target="_blank">Jump Point Search algorithm</a>.</p>
 ---@field findPath fun(self:Room,fromPos:RoomPosition,toPos:RoomPosition,opts:any?):({x:integer,y:integer,dx:integer,dy:integer,direction:string}[])
 --- <p>Returns an array of events happened on the previous tick in this room.  </p>

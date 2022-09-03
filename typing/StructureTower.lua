@@ -26,17 +26,17 @@
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructureTower)
+---@field destroy fun(self:StructureTower):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureTower)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructureTower,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructureTower,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 --- <p>Remotely attack any creep, power creep or structure in the room.</p>
----@field attack fun(self:StructureTower,target:Creep|PowerCreep|Structure)
+---@field attack fun(self:StructureTower,target:Creep|PowerCreep|Structure):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_ENERGY|ERR_INVALID_TARGET|ERR_RCL_NOT_ENOUGH)
 --- <p>Remotely heal any creep or power creep in the room.</p>
----@field heal fun(self:StructureTower,target:Creep|PowerCreep)
+---@field heal fun(self:StructureTower,target:Creep|PowerCreep):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_ENERGY|ERR_INVALID_TARGET|ERR_RCL_NOT_ENOUGH)
 --- <p>Remotely repair any structure in the room.</p>
----@field repair fun(self:StructureTower,target:Structure)
+---@field repair fun(self:StructureTower,target:Structure):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_ENERGY|ERR_INVALID_TARGET|ERR_RCL_NOT_ENOUGH)
 ---@field owner StructureTower.owner
 local StructureTower = {}
 

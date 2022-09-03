@@ -28,13 +28,13 @@
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
 --- <p>Destroy this structure immediately.</p>
----@field destroy fun(self:StructureLink)
+---@field destroy fun(self:StructureLink):(OK|ERR_NOT_OWNER|ERR_BUSY)
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureLink)
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
----@field notifyWhenAttacked fun(self:StructureLink,enabled:boolean)
+---@field notifyWhenAttacked fun(self:StructureLink,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 --- <p>Remotely transfer energy to another link at any location in the same room.</p>
----@field transferEnergy fun(self:StructureLink,target:StructureLink,amount:any?)
+---@field transferEnergy fun(self:StructureLink,target:StructureLink,amount:any?):(OK|ERR_NOT_OWNER|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS|ERR_TIRED|ERR_RCL_NOT_ENOUGH)
 ---@field owner StructureLink.owner
 local StructureLink = {}
 
