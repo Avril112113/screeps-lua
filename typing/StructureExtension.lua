@@ -20,15 +20,20 @@
 --- <p>Whether this is your own structure.</p>
 ---@field my boolean
 --- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#StructureExtension.store"><code>.store[RESOURCE_ENERGY]</code></a>.</p>
+---@deprecated
 ---@field energy number
 --- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#Store.getCapacity"><code>.store.getCapacity(RESOURCE_ENERGY)</code></a>.</p> <p>The total amount of energy the extension can contain.</p>
+---@deprecated
 ---@field energyCapacity number
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Destroy this structure immediately.</p>
 ---@field destroy fun(self:StructureExtension):(OK|ERR_NOT_OWNER|ERR_BUSY)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureExtension)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
 ---@field notifyWhenAttacked fun(self:StructureExtension,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 ---@field owner StructureExtension.owner

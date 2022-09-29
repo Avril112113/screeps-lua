@@ -9,30 +9,43 @@
 ---@field x number
 --- <p>Y position in the room.</p>
 ---@field y number
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Create new <a href="https://docs.screeps.com/api/#ConstructionSite">ConstructionSite</a> at the specified location.</p>
 ---@field createConstructionSite fun(self:RoomPosition,structureType:string,name:any?):(OK|ERR_INVALID_TARGET|ERR_FULL|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Create new <a href="https://docs.screeps.com/api/#Flag">Flag</a> at the specified location.</p>
----@field createFlag fun(self:RoomPosition,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_INVALID_ARGS)
+---@field createFlag fun(self:RoomPosition,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_INVALID_ARGS|string)
+--- ![3](imgs/cpu_3.png) - High CPU cost.
 --- <p>Find an object with the shortest path from the given position. Uses <a href="http://en.wikipedia.org/wiki/Jump_point_search" target="_blank">Jump Point Search algorithm</a> and <a href="http://en.wikipedia.org/wiki/Dijkstra" rel="noopener" target="_blank">Dijkstra's algorithm</a>.</p>
 ---@field findClosestByPath fun(self:RoomPosition,type:number,opts:any?)|fun(self:RoomPosition,objects:any[],opts:any?)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Find an object with the shortest linear distance from the given position.</p>
 ---@field findClosestByRange fun(self:RoomPosition,type:number,opts:any?)|fun(self:RoomPosition,objects:any[],opts:any?)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Find all objects in the specified linear range.</p>
----@field findInRange fun(self:RoomPosition,type:number,range:number,opts:any?)|fun(self:RoomPosition,objects:any[],range:number,opts:any?)
+---@field findInRange fun(self:RoomPosition,type:number,range:number,opts:any?):(RoomObject[])|fun(self:RoomPosition,objects:any[],range:number,opts:any?):(RoomObject[])
+--- ![3](imgs/cpu_3.png) - High CPU cost.
 --- <p>Find an optimal path to the specified position using <a href="http://en.wikipedia.org/wiki/Jump_point_search" target="_blank">Jump Point Search algorithm</a>. This method is a shorthand for <a href="https://docs.screeps.com/api/#Room.findPath">Room.findPath</a>. If the target is in another room, then the corresponding exit will be used as a target.</p>
 ---@field findPathTo fun(self:RoomPosition,x:number,y:number,opts:any?):({x:integer,y:integer,dx:integer,dy:integer,direction:string}[])|fun(self:RoomPosition,target:table,opts:any?):({x:integer,y:integer,dx:integer,dy:integer,direction:string}[])
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Get linear direction to the specified position.</p>
 ---@field getDirectionTo fun(self:RoomPosition,x:number,y:number)|fun(self:RoomPosition,target:table)
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Get linear range to the specified position.</p>
 ---@field getRangeTo fun(self:RoomPosition,x:number,y:number)|fun(self:RoomPosition,target:table)
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Check whether this position is in the given range of another position.</p>
 ---@field inRangeTo fun(self:RoomPosition,x:number,y:number,range:number)|fun(self:RoomPosition,target:RoomPosition,range:number)
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Check whether this position is the same as the specified position.</p>
 ---@field isEqualTo fun(self:RoomPosition,x:number,y:number)|fun(self:RoomPosition,target:table)
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Check whether this position is on the adjacent square to the specified position. The same as <code>inRangeTo(target, 1)</code>.</p>
 ---@field isNearTo fun(self:RoomPosition,x:number,y:number)|fun(self:RoomPosition,target:table)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Get the list of objects at the specified room position.</p>
 ---@field look fun(self:RoomPosition):(({type:string}|table)[])
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Get an object with the given type at the specified room position.</p>
----@field lookFor fun(self:RoomPosition,type:string)
+---@field lookFor fun(self:RoomPosition,type:string):(RoomObject[])
 local RoomPosition = {}

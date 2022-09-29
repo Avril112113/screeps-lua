@@ -5,22 +5,31 @@
 ---@class RoomVisual
 --- <p>The name of the room.</p>
 ---@field roomName string
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Draw a line.</p>
 ---@field line fun(self:RoomVisual,x1:number,y1:number,x2:number,y2:number,style:any?)|fun(self:RoomVisual,pos1:RoomPosition,pos2:RoomPosition,style:any?)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Draw a circle.</p>
 ---@field circle fun(self:RoomVisual,x:number,y:number,style:any?)|fun(self:RoomVisual,pos:RoomPosition,style:any?)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Draw a rectangle.</p>
 ---@field rect fun(self:RoomVisual,x:number,y:number,width:number,height:number,style:any?)|fun(self:RoomVisual,topLeftPos:RoomPosition,width:number,height:number,style:any?)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Draw a polyline.</p>
 ---@field poly fun(self:RoomVisual,points:any[],style:any?)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Draw a text label. You can use any valid Unicode characters, including <a href="http://unicode.org/emoji/charts/emoji-style.txt" target="_blank">emoji</a>.</p>
 ---@field text fun(self:RoomVisual,text:string,x:number,y:number,style:any?)|fun(self:RoomVisual,text:string,pos:RoomPosition,style:any?)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Remove all visuals from the room.</p>
 ---@field clear fun(self:RoomVisual)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Get the stored size of all visuals added in the room in the current tick. It must not exceed 512,000 (500 KB).</p>
 ---@field getSize fun(self:RoomVisual)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Returns a compact representation of all visuals added in the room in the current tick.</p>
 ---@field export fun(self:RoomVisual)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Add previously exported (with <a href="https://docs.screeps.com/api/#RoomVisual.export">RoomVisual.export</a>) room visuals to the room visual data of the current tick. </p>
 ---@field import fun(self:RoomVisual,val:string)
 local RoomVisual = {}

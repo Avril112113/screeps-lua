@@ -1,5 +1,7 @@
 import re
 import json
+from typing import Optional
+
 from bs4 import Tag
 from dataclasses import dataclass
 
@@ -10,7 +12,10 @@ DESC_FIELDS_REGEX = {
 }
 
 RETURN_VALUE_REGEX = {
-	"IS_CODE": re.compile(r"following (?:error )?codes"),
+	re.compile(r"following (?:error )?codes"): lambda tags, ri, match: "|".join([field["constant"].text for field in parse_table(tags[ri+1])]),
+	re.compile(r"The name of"): lambda tags, ri, match: "string",
+	re.compile(r"[Aa]n array of (\w+) objects"): lambda tags, ri, match: f"{match.group(1)}[]",
+	re.compile(r"[Aa]n array (?:of|with the) objects"): lambda tags, ri, match: "RoomObject[]",
 }
 
 
@@ -18,6 +23,14 @@ TYPE_JS_TO_LUA = {
 	"object": "table",
 	"array": "any[]",
 	"null": "nil"
+}
+
+CPU_CLASS_DESC = {
+	"0": "Insignificant CPU cost",
+	"1": "Low CPU cost.",
+	"2": "Medium CPU cost.",
+	"3": "High CPU cost.",
+	"A": "Additional 0.2 CPU if OK is returned.",
 }
 
 
@@ -117,6 +130,8 @@ class JSMethod:
 		desc: str
 
 	description: str
+	deprecated: bool
+	cpu_class: Optional[str]
 	overloads: list[list[JSArg]]
 	returns: list[str]
 	args_info: dict[str, ArgInfo]
@@ -146,10 +161,10 @@ class JSMethod:
 							# print("- CLEANED -")
 							# print(json_str)
 							pass
-					elif RETURN_VALUE_REGEX["IS_CODE"].search(tag_text):
-						table = parse_table(tags[ri+1])
-						constants = [field["constant"].text for field in table]
-						self.returns.append("|".join(constants))
+					else:
+						for reg, f in RETURN_VALUE_REGEX.items():
+							if match := reg.search(tag_text):
+								self.returns.append(f(tags, ri, match))
 				self.tag_end = i-1
 				break
 
@@ -166,6 +181,11 @@ class JSMethod:
 					break
 
 	def parse_tags(self, tags: list[Tag]):
+		self.deprecated = "api-property--deprecated" in tags[0]["class"]
+		if cpu_tag := tags[0].find(class_="api-property__cpu"):
+			self.cpu_class = cpu_tag["class"][1].replace("api-property__cpu--", "")
+		else:
+			self.cpu_class = None
 		self.tag_start = 1
 		self.tag_end = len(tags) - 1
 		self.parse_return_tags(tags)
@@ -197,13 +217,16 @@ class JSMethod:
 	def generate_comment(self, self_type: str):
 		# TODO: function type
 		return "\n".join([
+			*((f"--- ![{self.cpu_class}](imgs/cpu_{self.cpu_class}.png) - {CPU_CLASS_DESC[self.cpu_class]}",) if self.cpu_class else ()),  # Not working with @field :(
 			desc_to_comment(self.description),
+			*((f"---@deprecated",) if self.deprecated else ()),  # Not working with @field :(
 			f"---@field {self.name} {'|'.join([f'fun({self.generate_args_str(self_type, overload)})' + (':('+'|'.join(self.returns)+')' if len(self.returns) > 0 else '') for overload in self.overloads])}",
 		])
 
 
 class JSField:
 	description: str
+	deprecated: bool = False
 
 	# Tag index to start and end at
 	tag_start: int
@@ -221,6 +244,7 @@ class JSField:
 		# See `Structure.effects`
 		# TODO: If this type is array without type opts, check description for type
 		#       It can contain `an array of objects with the following properties` followed by a table for example
+		self.deprecated = "api-property--deprecated" in tags[0]["class"]
 		self.tag_start = 1
 		self.tag_end = len(tags) - 1
 		self.description = tags_to_desc(tags[self.tag_start:self.tag_end+1])
@@ -228,6 +252,7 @@ class JSField:
 	def generate_comment(self):
 		return "\n".join([
 			desc_to_comment(self.description),
+			*((f"---@deprecated",) if self.deprecated else ()),  # Not working with @field :(
 			f"---@field {self.name} {to_lua_type(self.type)}",
 		])
 
@@ -257,7 +282,6 @@ class JSClass:
 				jsclass = jsclass.classes[part]
 			name = path[-1]
 			# TODO: Check for `api-property__inherited` and instead add inherited class instead of adding to this class IN <h2>
-			# TODO: Check for `api-property--deprecated` ON <h2>
 			# TODO: Check for `api-property__cpu` IN <h2> (there are various types)
 			if name == "constructor":
 				what = "constructor"
@@ -289,7 +313,7 @@ class JSClass:
 		self.description = tags_to_desc(tags[tag_start:tag_end+1])
 
 	def parse_constructor(self, jsclass: "JSClass", name: str, tags: list[Tag]):
-		pass
+		pass  # TODO
 
 	def parse_property(self, jsclass: "JSClass", name: str, type_: str, tags: list[Tag]):
 		field = JSField(name, type_, jsclass)

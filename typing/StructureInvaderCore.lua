@@ -25,10 +25,13 @@
 ---@field ticksToDeploy number
 --- <p>If the core is in process of spawning a new creep, this object will contain a <a href="https://docs.screeps.com/api/#StructureSpawn-Spawning"><code>StructureSpawn.Spawning</code></a> object, or null otherwise.</p>
 ---@field spawning StructureSpawn.Spawning
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Destroy this structure immediately.</p>
 ---@field destroy fun(self:StructureInvaderCore):(OK|ERR_NOT_OWNER|ERR_BUSY)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureInvaderCore)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
 ---@field notifyWhenAttacked fun(self:StructureInvaderCore,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 ---@field owner StructureInvaderCore.owner

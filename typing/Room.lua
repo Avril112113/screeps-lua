@@ -19,32 +19,46 @@
 ---@field terminal StructureTerminal
 --- <p>A <a href="https://docs.screeps.com/api/#RoomVisual">RoomVisual</a> object for this room. You can use this object to draw simple shapes (lines, circles, text labels) in the room.</p>
 ---@field visual RoomVisual
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Serialize a path array into a short string representation, which is suitable to store in memory.</p>
 ---@field serializePath fun(self:Room,path:any[])
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Deserialize a short string path representation into an array form.</p>
 ---@field deserializePath fun(self:Room,path:string)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Create new <a href="https://docs.screeps.com/api/#ConstructionSite">ConstructionSite</a> at the specified location.</p>
 ---@field createConstructionSite fun(self:Room,x:number,y:number,structureType:string,name:any?):(OK|ERR_NOT_OWNER|ERR_INVALID_TARGET|ERR_FULL|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)|fun(self:Room,pos:table,structureType:string,name:any?):(OK|ERR_NOT_OWNER|ERR_INVALID_TARGET|ERR_FULL|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Create new <a href="https://docs.screeps.com/api/#Flag">Flag</a> at the specified location.</p>
----@field createFlag fun(self:Room,x:number,y:number,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_FULL|ERR_INVALID_ARGS)|fun(self:Room,pos:table,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_FULL|ERR_INVALID_ARGS)
+---@field createFlag fun(self:Room,x:number,y:number,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_FULL|ERR_INVALID_ARGS|string)|fun(self:Room,pos:table,name:any?,color:any?,secondaryColor:any?):(ERR_NAME_EXISTS|ERR_FULL|ERR_INVALID_ARGS|string)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Find all objects of the specified type in the room. Results are cached automatically for the specified room and type before applying any custom filters. This automatic cache lasts until the end of the tick.</p>
----@field find fun(self:Room,type:number,opts:any?)
+---@field find fun(self:Room,type:number,opts:any?):(RoomObject[])
+--- ![3](imgs/cpu_3.png) - High CPU cost.
 --- <p>Find the exit direction en route to another room. Please note that this method is not required for inter-room movement, you can simply pass the target in another room into <a href="https://docs.screeps.com/api/#Creep.moveTo"><code>Creep.moveTo</code></a> method.</p>
 ---@field findExitTo fun(self:Room,room:string|Room):(ERR_NO_PATH|ERR_INVALID_ARGS)
+--- ![3](imgs/cpu_3.png) - High CPU cost.
 --- <p>Find an optimal path inside the room between fromPos and toPos using <a href="http://en.wikipedia.org/wiki/Jump_point_search" target="_blank">Jump Point Search algorithm</a>.</p>
 ---@field findPath fun(self:Room,fromPos:RoomPosition,toPos:RoomPosition,opts:any?):({x:integer,y:integer,dx:integer,dy:integer,direction:string}[])
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Returns an array of events happened on the previous tick in this room.  </p>
 ---@field getEventLog fun(self:Room,raw:boolean?)
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Creates a <a href="https://docs.screeps.com/api/#RoomPosition">RoomPosition</a> object at the specified location.</p>
 ---@field getPositionAt fun(self:Room,x:number,y:number)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Get a <a href="https://docs.screeps.com/api/#Room-Terrain"><code>Room.Terrain</code></a> object which provides fast access to static terrain data. This method works for any room in the world even if you have no access to it.</p>
 ---@field getTerrain fun(self:Room)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Get the list of objects at the specified room position.</p>
 ---@field lookAt fun(self:Room,x:number,y:number):(({type:string}|table)[])|fun(self:Room,target:table):(({type:string}|table)[])
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Get the list of objects at the specified room area.</p>
 ---@field lookAtArea fun(self:Room,top:number,left:number,bottom:number,right:number,asArray:any?):(table<integer,table<integer,({type:string}|table)[]>>|({x:integer,y:integer,type:string}|table)[])
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Get an object with the given type at the specified room position.</p>
----@field lookForAt fun(self:Room,type:string,x:number,y:number)|fun(self:Room,type:string,target:table)
+---@field lookForAt fun(self:Room,type:string,x:number,y:number):(RoomObject[])|fun(self:Room,type:string,target:table):(RoomObject[])
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Get the list of objects with the given type at the specified room area.</p>
 ---@field lookForAtArea fun(self:Room,type:string,top:number,left:number,bottom:number,right:number,asArray:any?):(table<integer,table<integer,table[]>>|{x:integer,y:integer,structure:table}[])
 ---@field Terrain Room.Terrain
@@ -52,8 +66,10 @@ local Room = {}
 
 --- <p>An object which provides fast access to room terrain data. These objects can be constructed for any room in the world even if you have no access to it.</p> <p>Technically every <code>Room.Terrain</code> object is a very lightweight adapter to underlying static terrain buffers with corresponding minimal accessors.</p>
 ---@class Room.Terrain
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Get terrain type at the specified room position by <code>(x,y)</code> coordinates. Unlike the <a href="https://docs.screeps.com/api/#Game.map.getTerrainAt"><code>Game.map.getTerrainAt(...)</code></a> method, this one doesn't perform any string operations and returns integer terrain type values (see below).</p>
 ---@field get fun(self:Room.Terrain,x:number,y:number)
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <p>Get copy of underlying static terrain buffer. <strong>Current underlying representation is <code>Uint8Array</code></strong>.</p>
 ---@field getRawBuffer fun(self:Room.Terrain,destinationArray:any?)
 local Terrain = {}

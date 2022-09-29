@@ -12,6 +12,7 @@
 --- <p>An array describing the creep’s body. Each element contains the following properties:</p> <table><thead><tr><th>parameter</th><th>type</th><th>description</th></tr></thead><tbody><tr><td><code>boost</code></td><td>string | undefined</td><td><p>If the body part is boosted, this property specifies the mineral type which is used for boosting. One of the <code>RESOURCE_*</code> constants. <a href="https://docs.screeps.com/resources.html">Learn more</a></p></td></tr><tr><td><code>type</code></td><td>string</td><td><p>One of the body part types constants.</p></td></tr><tr><td><code>hits</code></td><td>number</td><td><p>The remaining amount of hit points of this body part.</p></td></tr></tbody></table>
 ---@field body any[]
 --- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#Store.getCapacity"><code>Creep.store.getCapacity()</code></a>.</p>
+---@deprecated
 ---@field carryCapacity number
 --- <p>The movement fatigue indicator. If it is greater than zero, the creep cannot move.</p>
 ---@field fatigue number
@@ -35,60 +36,88 @@
 ---@field store Store
 --- <p>The remaining amount of game ticks after which the creep will die.</p>
 ---@field ticksToLive number
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Attack another creep, power creep, or structure in a short-ranged attack. Requires the <code>ATTACK</code> body part. If the target is inside a rampart, then the rampart is attacked instead. The target has to be at adjacent square to the creep. If the target is a creep with <code>ATTACK</code> body parts and is not inside a rampart, it will automatically hit back at the attacker.</p>
 ---@field attack fun(self:Creep,target:Creep|PowerCreep|Structure):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Decreases the controller's downgrade timer by 300 ticks per every <code>CLAIM</code> body part, or reservation timer by 1 tick per every <code>CLAIM</code> body part. If the controller under attack is owned, it cannot be upgraded or attacked again for the next 1,000 ticks. The target has to be at adjacent square to the creep.</p>
 ---@field attackController fun(self:Creep,target:StructureController):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_TIRED|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Build a structure at the target construction site using carried energy. Requires <code>WORK</code> and <code>CARRY</code> body parts. The target has to be within 3 squares range of the creep.</p>
 ---@field build fun(self:Creep,target:ConstructionSite):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Cancel the order given during the current game tick.</p>
 ---@field cancelOrder fun(self:Creep,methodName:string):(OK|ERR_NOT_FOUND)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Claims a neutral controller under your control. Requires the <code>CLAIM</code> body part. The target has to be at adjacent square to the creep. You need to have the corresponding Global Control Level in order to claim a new room. If you don't have enough GCL, consider <a href="https://docs.screeps.com/api/#reserveController">reserving</a> this room instead. <a href="https://docs.screeps.com/control.html#Global-Control-Level">Learn more</a></p>
 ---@field claimController fun(self:Creep,target:StructureController):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_NO_BODYPART|ERR_GCL_NOT_ENOUGH)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Dismantles any structure that can be constructed (even hostile) returning 50% of the energy spent on its repair. Requires the <code>WORK</code> body part. If the creep has an empty <code>CARRY</code> body part, the energy is put into it; otherwise it is dropped on the ground. The target has to be at adjacent square to the creep.</p>
 ---@field dismantle fun(self:Creep,target:Structure):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Drop this resource on the ground.</p>
 ---@field drop fun(self:Creep,resourceType:string,amount:any?):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_ARGS)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Add one more available safe mode activation to a room controller. The creep has to be at adjacent square to the target room controller and have 1000 ghodium resource.</p>
 ---@field generateSafeMode fun(self:Creep,controller:any):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Get the quantity of live body parts of the given type. Fully damaged parts do not count.</p>
 ---@field getActiveBodyparts fun(self:Creep,type:string)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Harvest energy from the source or resources from minerals and deposits. Requires the <code>WORK</code> body part. If the creep has an empty <code>CARRY</code> body part, the harvested resource is put into it; otherwise it is dropped on the ground. The target has to be at an adjacent square to the creep.</p>
 ---@field harvest fun(self:Creep,target:Source|Mineral|Deposit):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_FOUND|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_TIRED|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Heal self or another creep. It will restore the target creep’s damaged body parts function and increase the hits counter. Requires the <code>HEAL</code> body part. The target has to be at adjacent square to the creep.</p>
 ---@field heal fun(self:Creep,target:Creep|PowerCreep):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Move the creep one square in the specified direction. Requires the <code>MOVE</code> body part, or another creep nearby <a href="https://docs.screeps.com/api/#Creep.pull">pulling</a> the creep. In case if you call <code>move</code> on a creep nearby, the <code>ERR_TIRED</code> and the <code>ERR_NO_BODYPART</code> checks will be bypassed; otherwise, the <code>ERR_NOT_IN_RANGE</code> check will be bypassed. </p>
 ---@field move fun(self:Creep,direction:Creep|number):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS|ERR_TIRED|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Move the creep using the specified predefined path. Requires the <code>MOVE</code> body part.</p>
 ---@field moveByPath fun(self:Creep,path:any[]|string):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_FOUND|ERR_INVALID_ARGS|ERR_TIRED|ERR_NO_BODYPART)
+--- ![3](imgs/cpu_3.png) - High CPU cost.
 --- <p>Find the optimal path to the target within the same room and move to it. A shorthand to consequent calls of <a href="https://docs.screeps.com/api/#RoomPosition.findPathTo">pos.findPathTo()</a> and <a href="https://docs.screeps.com/api/#Creep.move">move()</a> methods. If the target is in another room, then the corresponding exit will be used as a target. Requires the <code>MOVE</code> body part.</p>
 ---@field moveTo fun(self:Creep,x:number,y:number,opts:any?):(OK|ERR_NOT_OWNER|ERR_NO_PATH|ERR_BUSY|ERR_NOT_FOUND|ERR_INVALID_TARGET|ERR_TIRED|ERR_NO_BODYPART)|fun(self:Creep,target:table,opts:any?):(OK|ERR_NOT_OWNER|ERR_NO_PATH|ERR_BUSY|ERR_NOT_FOUND|ERR_INVALID_TARGET|ERR_TIRED|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Toggle auto notification when the creep is under attack. The notification will be sent to your account email. Turned on by default.</p>
 ---@field notifyWhenAttacked fun(self:Creep,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_ARGS)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Pick up an item (a dropped piece of energy). Requires the <code>CARRY</code> body part. The target has to be at adjacent square to the creep or at the same square.</p>
 ---@field pickup fun(self:Creep,target:Resource):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Help another creep to follow this creep. The fatigue generated for the target's move will be added to the creep instead of the target. Requires the <code>MOVE</code> body part. The target has to be at adjacent square to the creep. The creep must <a href="https://docs.screeps.com/api/#Creep.move">move</a> elsewhere, and the target must <a href="https://docs.screeps.com/api/#Creep.move">move</a> towards the creep.</p>
 ---@field pull fun(self:Creep,target:Creep):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>A ranged attack against another creep or structure. Requires the <code>RANGED_ATTACK</code> body part. If the target is inside a rampart, the rampart is attacked instead. The target has to be within 3 squares range of the creep.</p>
 ---@field rangedAttack fun(self:Creep,target:Creep|PowerCreep|Structure):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Heal another creep at a distance. It will restore the target creep’s damaged body parts function and increase the hits counter. Requires the <code>HEAL</code> body part. The target has to be within 3 squares range of the creep.</p>
 ---@field rangedHeal fun(self:Creep,target:Creep|PowerCreep):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>A ranged attack against all hostile creeps or structures within 3 squares range. Requires the <code>RANGED_ATTACK</code> body part. The attack power depends on the range to each target. Friendly units are not affected.</p>
 ---@field rangedMassAttack fun(self:Creep):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Repair a damaged structure using carried energy. Requires the <code>WORK</code> and <code>CARRY</code> body parts. The target has to be within 3 squares range of the creep.</p>
 ---@field repair fun(self:Creep,target:Structure):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Temporarily block a neutral controller from claiming by other players and restore energy sources to their full capacity. Each tick, this command increases the counter of the period during which the controller is unavailable by 1 tick per each <code>CLAIM</code> body part. The maximum reservation period to maintain is 5,000 ticks. The target has to be at adjacent square to the creep.</p>
 ---@field reserveController fun(self:Creep,target:StructureController):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![0](imgs/cpu_0.png) - Insignificant CPU cost
 --- <p>Display a visual speech balloon above the creep with the specified message. The message will be available for one tick. You can read the last message using the <code>saying</code> property. Any valid Unicode characters are allowed, including <a href="http://unicode.org/emoji/charts/emoji-style.txt" target="_blank">emoji</a>.</p>
 ---@field say fun(self:Creep,message:string,public:any?):(OK|ERR_NOT_OWNER|ERR_BUSY)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Sign a controller with an arbitrary text visible to all players. This text will appear in the room UI, in the world map, and can be accessed via the API. You can sign unowned and hostile controllers. The target has to be at adjacent square to the creep. Pass an empty string to remove the sign.</p>
 ---@field signController fun(self:Creep,target:StructureController,text:string):(OK|ERR_BUSY|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Kill the creep immediately.</p>
 ---@field suicide fun(self:Creep):(OK|ERR_NOT_OWNER|ERR_BUSY)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Transfer resource from the creep to another object. The target has to be at adjacent square to the creep.</p>
 ---@field transfer fun(self:Creep,target:Creep|PowerCreep|Structure,resourceType:string,amount:any?):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Upgrade your controller to the next level using carried energy. Upgrading controllers raises your Global Control Level in parallel. Requires <code>WORK</code> and <code>CARRY</code> body parts. The target has to be within 3 squares range of the creep. </p> <p>A fully upgraded level 8 controller can't be upgraded over 15 energy units per tick regardless of creeps abilities. The cumulative effect of all the creeps performing <code>upgradeController</code> in the current tick is taken into account. This limit can be increased by using <a href="https://docs.screeps.com/resources.html">ghodium mineral boost</a>.</p> <p>Upgrading the controller raises its <code>ticksToDowngrade</code> timer by 100. The timer must be full in order for controller to be levelled up.</p>
 ---@field upgradeController fun(self:Creep,target:StructureController):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Withdraw resources from a structure or tombstone. The target has to be at adjacent square to the creep. Multiple creeps can withdraw from the same object in the same tick. Your creeps can withdraw resources from hostile structures/tombstones as well, in case if there is no hostile rampart on top of it.</p> <p>This method should not be used to transfer resources between creeps. To transfer between creeps, use the <a href="https://docs.screeps.com/api/#Creep.transfer"><code>transfer</code></a> method on the original creep.</p>
 ---@field withdraw fun(self:Creep,target:Structure|Tombstone|Ruin,resourceType:string,amount:any?):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_INVALID_ARGS)
 ---@field carry Creep.carry

@@ -19,6 +19,7 @@
 ---@field progressTotal number
 --- <p>One of the <code>STRUCTURE_*</code> constants.</p>
 ---@field structureType string
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Remove the construction site.</p>
 ---@field remove fun(self:ConstructionSite):(OK|ERR_NOT_OWNER)
 ---@field owner ConstructionSite.owner

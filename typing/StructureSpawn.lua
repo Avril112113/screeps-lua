@@ -20,8 +20,10 @@
 --- <p>Whether this is your own structure.</p>
 ---@field my boolean
 --- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#StructureExtension.store"><code>.store[RESOURCE_ENERGY]</code></a>.</p>
+---@deprecated
 ---@field energy number
 --- <div class="api-deprecated"><p>This property is deprecated and will be removed soon.</p></div> <p>An alias for <a href="https://docs.screeps.com/api/#Store.getCapacity"><code>.store.getCapacity(RESOURCE_ENERGY)</code></a>.</p>
+---@deprecated
 ---@field energyCapacity number
 --- <p>A shorthand to <code>Memory.spawns[spawn.name]</code>. You can use it for quick access the spawn’s specific memory data object. <a href="https://docs.screeps.com/global-objects.html#Memory-object">Learn more about memory</a></p>
 ---@field memory any
@@ -31,20 +33,30 @@
 ---@field spawning StructureSpawn.Spawning
 --- <p>A <a href="https://docs.screeps.com/api/#Store"><code>Store</code></a> object that contains cargo of this structure.</p>
 ---@field store Store
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Destroy this structure immediately.</p>
 ---@field destroy fun(self:StructureSpawn):(OK|ERR_NOT_OWNER|ERR_BUSY)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureSpawn)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
 ---@field notifyWhenAttacked fun(self:StructureSpawn,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
+--- ![1](imgs/cpu_1.png) - Low CPU cost.
 --- <div class="api-deprecated"><p>This method is deprecated and will be removed soon. Please use <a href="https://docs.screeps.com/api/#StructureSpawn.spawnCreep"><code>StructureSpawn.spawnCreep</code></a> with <code>dryRun</code> flag instead.</p></div> <p>Check if a creep can be created.</p>
+---@deprecated
 ---@field canCreateCreep fun(self:StructureSpawn,body:(string)[],name:any?):(OK|ERR_NOT_OWNER|ERR_NAME_EXISTS|ERR_BUSY|ERR_NOT_ENOUGH_ENERGY|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <div class="api-deprecated"><p>This method is deprecated and will be removed soon. Please use <a href="https://docs.screeps.com/api/#StructureSpawn.spawnCreep"><code>StructureSpawn.spawnCreep</code></a> instead.</p></div> <p>Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.</p>
----@field createCreep fun(self:StructureSpawn,body:(string)[],name:any?,memory:any?)
+---@deprecated
+---@field createCreep fun(self:StructureSpawn,body:(string)[],name:any?,memory:any?):(string)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.</p>
 ---@field spawnCreep fun(self:StructureSpawn,body:(string)[],name:string,opts:any?):(OK|ERR_NOT_OWNER|ERR_NAME_EXISTS|ERR_BUSY|ERR_NOT_ENOUGH_ENERGY|ERR_INVALID_ARGS|ERR_RCL_NOT_ENOUGH)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Kill the creep and drop up to 100% of resources spent on its spawning and boosting depending on remaining life time. The target should be at adjacent square. Energy return is limited to 125 units per body part.</p>
 ---@field recycleCreep fun(self:StructureSpawn,target:Creep):(OK|ERR_NOT_OWNER|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_RCL_NOT_ENOUGH)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Increase the remaining time to live of the target creep. The target should be at adjacent square. The target should not have CLAIM body parts.The spawn should not be busy with the spawning process. Each execution increases the creep's timer by amount of ticks according to this formula: </p> <p>Energy required for each execution is determined using this formula: </p> <p>Renewing a creep removes all of its boosts.</p>
 ---@field renewCreep fun(self:StructureSpawn,target:Creep):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_ENERGY|ERR_INVALID_TARGET|ERR_FULL|ERR_NOT_IN_RANGE|ERR_RCL_NOT_ENOUGH)
 ---@field owner StructureSpawn.owner
@@ -67,8 +79,10 @@ local owner = {}
 ---@field remainingTime number
 --- <p>A link to the spawn.</p>
 ---@field spawn StructureSpawn
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Cancel spawning immediately. Energy spent on spawning is not returned. </p>
 ---@field cancel fun(self:StructureSpawn.Spawning):(OK|ERR_NOT_OWNER)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Set desired directions where the creep should move when spawned.</p>
 ---@field setDirections fun(self:StructureSpawn.Spawning,directions:(number)[]):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
 local Spawning = {}

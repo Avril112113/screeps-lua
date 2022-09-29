@@ -37,14 +37,19 @@
 ---@field ticksToDowngrade number
 --- <p>The amount of game ticks while this controller cannot be upgraded due to attack. Safe mode is also unavailable during this period.</p>
 ---@field upgradeBlocked number
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Destroy this structure immediately.</p>
 ---@field destroy fun(self:StructureController):(OK|ERR_NOT_OWNER|ERR_BUSY)
+--- ![2](imgs/cpu_2.png) - Medium CPU cost.
 --- <p>Check whether this structure can be used. If room controller level is insufficient, then this method will return false, and the structure will be highlighted with red in the game.</p>
 ---@field isActive fun(self:StructureController)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Toggle auto notification when the structure is under attack. The notification will be sent to your account email. Turned on by default.</p>
 ---@field notifyWhenAttacked fun(self:StructureController,enabled:boolean):(OK|ERR_NOT_OWNER|ERR_INVALID_ARGS)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Activate safe mode if available.</p>
 ---@field activateSafeMode fun(self:StructureController):(OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_ENOUGH_RESOURCES|ERR_TIRED)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Make your claimed controller neutral again.</p>
 ---@field unclaim fun(self:StructureController):(OK|ERR_NOT_OWNER)
 ---@field owner StructureController.owner

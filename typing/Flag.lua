@@ -17,10 +17,13 @@
 ---@field name string
 --- <p>Flag secondary color. One of the <code>COLOR_*</code> constants.</p>
 ---@field secondaryColor number
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Remove the flag.</p>
 ---@field remove fun(self:Flag)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Set new color of the flag.</p>
 ---@field setColor fun(self:Flag,color:string,secondaryColor:any?):(OK|ERR_INVALID_ARGS)
+--- ![A](imgs/cpu_A.png) - Additional 0.2 CPU if OK is returned.
 --- <p>Set new position of the flag.</p>
 ---@field setPosition fun(self:Flag,x:number,y:number):(OK|ERR_INVALID_TARGET)|fun(self:Flag,pos:table):(OK|ERR_INVALID_TARGET)
 local Flag = {}
