@@ -42,6 +42,7 @@ void JSObject::flush_cache() {
 	}
 }
 
+// This is no longer required as `nil` is now `undefined` instead of `null`
 int JSObject::_delete(lua_State* L) {
 	// Stack: userdata<JSObject>, index
 	JSObject* jsobject = JSObject::fromUserdata(L, 1);
@@ -91,7 +92,11 @@ int JSObject::__newindex(lua_State* L) {
 	JSObject* jsobject = JSObject::fromUserdata(L, 1);
 	emscripten::val index = convert_to_js(L, 2);
 	emscripten::val value = convert_to_js(L, 3);
-	jsobject->value.set(index, value);
+	if (value.isUndefined()) {
+		jsobject->value.delete_(index);
+	} else {
+		jsobject->value.set(index, value);
+	}
 	// NOTE: We don't cache anything here, when it's indexed it will be cached...
 	return 0;
 }

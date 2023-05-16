@@ -23,6 +23,9 @@ static void screepslua_init(lua_State* L) {
 	jsobject_init_reg(L);
 	jsobjectpairs_init_reg(L);
 
+	lua_pushlightuserdata(L, nullptr);
+	lua_setglobal(L, "null");
+
 	lua_newtable(L);
 	lua_setglobal(L, "Script");
 

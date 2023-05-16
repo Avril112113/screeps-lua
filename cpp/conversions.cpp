@@ -2,9 +2,13 @@
 
 
 int convert_to_lua(lua_State* L, emscripten::val value, bool throwaway) {
-	if (value.isNull() || value.isUndefined()) {
+	if (value.isUndefined() || value.isNull()) {
 		lua_pushnil(L);
-		return 1;	
+		return 1;
+	// Lua shouldn't have to deal with `null` and `undefined` in return values, as in most cases it doesn't matter.
+	// } else if (value.isNull()) {
+	// 	lua_pushlightuserdata(L, nullptr);
+	// 	return 1;
 	} else if (value.isNumber()) {
 		lua_pushnumber(L, value.as<lua_Number>());
 		return 1;
@@ -29,6 +33,8 @@ int convert_to_lua(lua_State* L, emscripten::val value, bool throwaway) {
 emscripten::val convert_to_js(lua_State* L, int n) {
 	// Stack: ..., any@n, ...
 	if (lua_isnil(L, n)) {
+		return emscripten::val::undefined();
+	} else if (lua_islightuserdata(L, n) && lua_topointer(L, n) == nullptr) {
 		return emscripten::val::null();
 	} else if (lua_isboolean(L, n)) {
 		return emscripten::val(lua_toboolean(L, n));

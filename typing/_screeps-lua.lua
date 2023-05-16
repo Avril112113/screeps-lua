@@ -24,3 +24,7 @@ JS = nil
 --- Access to JS Globals
 ---@type table<string|number, any>
 JSGlobal = nil
+
+---@type lightuserdata
+---@diagnostic disable-next-line: lowercase-global
+null = nil
