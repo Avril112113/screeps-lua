@@ -1,0 +1,8 @@
+{
+	"localhost": {
+		"host": "http://127.0.0.1:21025/",
+		"username": "<USERNAME>",
+		"password": "<PASSWORD>",
+		"branch": "default"
+	}
+}

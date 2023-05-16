@@ -105,14 +105,14 @@ def uploadFolder(srcpath: str, server: str):
 
 def create_project(srcpath: str):
 	if not os.path.isdir(srcpath):
-		shutil.copytree(f"{SCREEPS_LUA_PATH}src_starter", srcpath)
+		shutil.copytree(f"{SCREEPS_LUA_PATH}project_base/src", srcpath)
 	else:
 		# TODO Ask to update `{srcpath}/screeps-lua` instead
 		print(f"Skipped copying src_starter, \"{srcpath}\" exists. (update \"{srcpath}/screeps-lua\" manually if needed)")
 	if not os.path.isdir(".vscode"):
-		shutil.copytree(f"{SCREEPS_LUA_PATH}.vscode_starter", ".vscode")
+		shutil.copytree(f"{SCREEPS_LUA_PATH}project_base/.vscode", ".vscode")
 	if not os.path.isfile("servers.json"):
-		shutil.copy(f"{SCREEPS_LUA_PATH}servers.json", "./")
+		shutil.copy(f"{SCREEPS_LUA_PATH}project_base/servers.json", "./")
 	if not os.path.isdir("build"):
 		os.mkdir("./build")
 		shutil.copy(f"{SCREEPS_LUA_PATH}build/lua_wasm.wasm", "./build")

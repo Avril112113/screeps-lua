@@ -1,7 +1,9 @@
 **/__pycache__/
 .idea/
 node_modules/
-build/
-src/
-test/
-release/
+
+/test/
+
+/build/
+/src/
+/servers.json
